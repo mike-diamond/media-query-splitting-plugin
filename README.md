@@ -11,7 +11,7 @@ Also it handles loading of this files depending of the client's screen width.
 ## Install
 
 ```bash
-npm install --save media-query-splitting-plugin
+npm install --save-dev media-query-splitting-plugin
 ```
 
 
