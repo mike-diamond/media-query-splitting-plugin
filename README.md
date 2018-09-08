@@ -17,7 +17,7 @@ npm install --save media-query-splitting-plugin
 
 ## Usage
 
-####webpack.config.js
+#### webpack.config.js
 ```js
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const MediaQuerySplittingPlugin = require('media-query-splitting-plugin')
