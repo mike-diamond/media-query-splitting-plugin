@@ -1,2 +1,2 @@
 # media-query-splitting-plugin
-Webpack 4 plugin for media query splitting styles chunks
+Webpack 4 plugin for styles splitting by media query

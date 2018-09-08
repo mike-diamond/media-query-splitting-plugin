@@ -1,0 +1,30 @@
+{
+  "name": "media-query-splitting-plugin",
+  "version": "1.0.0",
+  "description": "Webpack 4 plugin for styles splitting by media query",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-diamond/media-query-splitting-plugin.git"
+  },
+  "keywords": [
+    "webpack",
+    "styles",
+    "splitting",
+    "media",
+    "chunks"
+  ],
+  "author": "Mike Diamond",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mike-diamond/media-query-splitting-plugin/issues"
+  },
+  "homepage": "https://github.com/mike-diamond/media-query-splitting-plugin#readme",
+  "dependencies": {
+    "clean-css": "^4.2.1",
+    "css": "^2.2.4"
+  }
+}
