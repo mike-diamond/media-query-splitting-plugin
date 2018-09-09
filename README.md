@@ -1,4 +1,4 @@
-# <img src="./images/logo.svg" height="30" style="margin-bottom: -5px;" /> media-query-splitting-plugin
+# <img src="./images/logo.svg" height="30" /> media-query-splitting-plugin
 Webpack 4 plugin for styles splitting by media query
 
 [![Npm Version](https://badge.fury.io/js/media-query-splitting-plugin.svg)](https://www.npmjs.com/package/media-query-splitting-plugin)
