@@ -87,7 +87,7 @@ All you need is to define client device type (mobile, tablet or desktop) and add
 
         return `
           <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
-          <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.mobile.04a9302b77ca5a27bfee.css)
+          <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.${mediaType}.04a9302b77ca5a27bfee.css)
         `
       })
   )
