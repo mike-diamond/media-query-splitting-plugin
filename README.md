@@ -52,3 +52,44 @@ module.exports = {
 }
 ```
 
+## Server side rendering
+The plugin splits each css asset to common chunk (which should be always included) and media chunks (for desktop, tablet (portrait and landscape or just tablet) and mobile, which should be included depending on client's device).
+
+How to use it with SSR.
+
+All you need is to define client device type (mobile, tablet or desktop) and add style chunk for this device in addition the to common chunk. Define device type depending on req.headers['user-agent'] (use express-device middleware for it).
+
+### Example:
+```js
+  const { getBundles } = require('react-loadable/webpack')
+  const assets = require('assets.json') // webpack-assets-manifest
+
+  const bundles  = getBundles(loadableAssets, loadableModules).filter(({ file }) => !/map$/.test(file))
+
+  const styles   = (
+    bundles
+      .filter((bundle) => bundle.file.endsWith('.css'))
+      .concat({ publicPath: assets.client.css })
+      .map(({ publicPath }) => {
+        const { isMobile, isTablet } = req
+
+        let mediaType     = 'desktop'
+
+        if (isMobile) {
+          mediaType       = 'mobile'
+        }
+        else if (isTablet) {
+          mediaType       = 'tablet'
+        }
+
+        const chunkId     = publicPath.replace(/\..*/, '')
+        const mediaPath   = publicPath.replace(chunkId, `${chunkId}.${mediaType}`)
+
+        return `
+          <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
+          <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.mobile.04a9302b77ca5a27bfee.css)
+        `
+      })
+  )
+
+```
