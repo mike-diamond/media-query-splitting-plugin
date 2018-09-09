@@ -29,6 +29,16 @@ module.exports = class MediaQuerySplittingPlugin {
         const hasChunkLodaing = /mini-css-extract-plugin CSS loading/.test(source)
 
         if (hasChunkLodaing) {
+          // let chunks                     = source.replace(/(.|\n)*var href = "" \+ chunkId \+ "\." \+ /, '').replace(/\[chunkId\](.|\n)*/, '')
+          //
+          // try {
+          //   chunks                       = JSON.parse(chunks)
+          //   chunks                       = Object.values(chunks)
+          // }
+          // catch (err) {
+          //   throw new Error('Parse chunks error. Try use mini-css-extract-plugin v0.4.3')
+          // }
+
           const matchMediaPolyfill       = `
             // matchMedia polyfill
             window.matchMedia||(window.matchMedia=function(){"use strict";var e=window.styleMedia||window.media;if(!e){var t,d=document.createElement("style"),i=document.getElementsByTagName("script")[0];d.type="text/css",d.id="matchmediajs-test",i?i.parentNode.insertBefore(d,i):document.head.appendChild(d),t="getComputedStyle"in window&&window.getComputedStyle(d,null)||d.currentStyle,e={matchMedium:function(e){var i="@media "+e+"{ #matchmediajs-test { width: 1px; } }";return d.styleSheet?d.styleSheet.cssText=i:d.textContent=i,"1px"===t.width}}}return function(t){return{matches:e.matchMedium(t||"all"),media:t||"all"}}}());
@@ -43,64 +53,68 @@ module.exports = class MediaQuerySplittingPlugin {
               }
             };
 
-            var mediaType = getMediaType();
-            var currentMediaType    = 'desktop';
+            var mediaType                = getMediaType();
+            var currentMediaType         = 'desktop';
 
             if (mediaType.isMobile) {
-              currentMediaType      = 'mobile'
+              currentMediaType           = 'mobile'
             }
             ${splitTablet
-            ? `
+              ? `
                 else if (mediaType.isTabletPortrait) {
-                  currentMediaType      = 'tabletPortrait'
+                  currentMediaType       = 'tabletPortrait'
                 }
                 else if (mediaType.isTabletLandscape) {
-                  currentMediaType      = 'tabletLandscape'
+                  currentMediaType       = 'tabletLandscape'
                 }`
-            : `
+              : `
                 else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {
-                  currentMediaType      = 'tablet'
+                  currentMediaType       = 'tablet'
                 }
               `
             }
+
             var tryAppendNewMedia = function() {
-              var linkElements      = document.getElementsByTagName('link');
-              var chunkIds = {};
+              var linkElements           = document.getElementsByTagName('link');
+              var chunkIds               = {};
               
               for (var i = 0; i < linkElements.length; i++) {
-                var chunkHref       = linkElements[i].href.replace(/.*\\//, '');
-                var chunkId         = chunkHref.replace(/\\..*/, '');
-                var chunkMediaType  = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
-                var chunkHash       = chunkHref.replace(/\\.css$/, '').replace('' + chunkId + '.' + chunkMediaType + '.', '');
-                var chunkHrefPrefix = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');
-
-                if (!chunkIds[chunkId]) {
-                  chunkIds[chunkId] = {
-                    mediaTypes: [ chunkMediaType ],
-                    hash: chunkHash,
-                    prefix: chunkHrefPrefix,
+                var chunkHref            = linkElements[i].href.replace(/.*\\//, '');
+                
+                if (/(mobile|tablet|desktop).*\\.css$/.test(chunkHref)) {
+                  var chunkId            = chunkHref.replace(/\\..*/, '');
+                  var chunkMediaType     = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
+                  var chunkHash          = chunkHref.replace(/\\.css$/, '').replace('' + chunkId + '.' + chunkMediaType + '.', '');
+                  var chunkHrefPrefix    = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');
+  
+                  if (!chunkIds[chunkId]) {
+                    chunkIds[chunkId]    = {
+                      mediaTypes: [ chunkMediaType ],
+                      hash: chunkHash,
+                      prefix: chunkHrefPrefix,
+                    }
                   }
-                }
-                else {
-                  chunkIds[chunkId].mediaTypes.push(chunkMediaType);
+                  else {
+                    chunkIds[chunkId].mediaTypes.push(chunkMediaType);
+                  }
                 }
               }
 
               for (var i in chunkIds) {
                 if (chunkIds.hasOwnProperty(i)) {
-                  var isTablet          = /tablet/.test(currentMediaType);
-                  var hasTablet         = chunkIds[i].mediaTypes.indexOf('tablet') !== -1;
-                  var _hasCurrentMedia  = chunkIds[i].mediaTypes.indexOf(currentMediaType) !== -1;
-                  var hasCurrentMedia   = isTablet ? hasTablet || _hasCurrentMedia : _hasCurrentMedia;
+                  var isTablet           = /tablet/.test(currentMediaType);
+                  var hasTablet          = chunkIds[i].mediaTypes.indexOf('tablet') !== -1;
+                  var _hasCurrentMedia   = chunkIds[i].mediaTypes.indexOf(currentMediaType) !== -1;
+                  var hasCurrentMedia    = isTablet ? hasTablet || _hasCurrentMedia : _hasCurrentMedia;
                   
                   if (!hasCurrentMedia) {
-                    var fullhref        = '' + chunkIds[i].prefix + '' + i + '.' + currentMediaType + '.' + chunkIds[i].hash + '.css';
-                    var linkTag         = document.createElement('link');
-                    var header          = document.getElementsByTagName('head')[0];
+                    var fullhref         = '' + chunkIds[i].prefix + '' + i + '.' + currentMediaType + '.' + chunkIds[i].hash + '.css';
+                    var linkTag          = document.createElement('link');
+                    var header           = document.getElementsByTagName('head')[0];
 
-                    linkTag.rel         = 'stylesheet';
-                    linkTag.type        = 'text/css';
-                    linkTag.href        = fullhref;
+                    linkTag.rel          = 'stylesheet';
+                    linkTag.type         = 'text/css';
+                    linkTag.href         = fullhref;
 
                     header.appendChild(linkTag);
                   }
@@ -110,31 +124,29 @@ module.exports = class MediaQuerySplittingPlugin {
 
             var resize = function() {
               var newMediaType
-              var mediaType = getMediaType();
+              var mediaType              = getMediaType();
 
               if (mediaType.isMobile) {
-                newMediaType = 'mobile'
+                newMediaType             = 'mobile'
               }
-              ${
-            splitTablet ? `
+              ${splitTablet
+                ? `
                   else if (mediaType.isTabletPortrait) {
-                    newMediaType = 'tabletPortrait'
+                    newMediaType         = 'tabletPortrait'
                   }
                   else if (mediaType.isTabletLandscape) {
-                    newMediaType = 'tabletLandscape'
-                  }
-                ` : `
-                  else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {
-                    newMediaType = 'tablet'
-                  }
-                `
-            }
+                    newMediaType         = 'tabletLandscape'
+                  }`
+                : `else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {
+                    newMediaType         = 'tablet'
+                  }`
+              }
               else {
-                newMediaType = 'desktop'
+                newMediaType             = 'desktop'
               }
 
               if (currentMediaType !== newMediaType) {
-                currentMediaType = newMediaType;
+                currentMediaType         = newMediaType;
               }
               
               tryAppendNewMedia()
@@ -152,15 +164,15 @@ module.exports = class MediaQuerySplittingPlugin {
               
               // Don't load tabletPortrait or tabletLandscape if there is tablet style
               if (/tablet/.test(mediaType)) {
-                var linkElements = document.getElementsByTagName('link');
-                var hasTabletStyle = false;
+                var linkElements         = document.getElementsByTagName('link');
+                var hasTabletStyle       = false;
 
                 for (var i = 0; i < linkElements.length; i++) {
-                  var chunkHref = linkElements[i].href.replace(/.*\\//, '');
+                  var chunkHref          = linkElements[i].href.replace(/.*\\//, '');
                   var currentChunkRegExp = new RegExp('^' + chunkId + '\\\\' + '.tablet' + '\\\\' + '.') 
                   
                   if (currentChunkRegExp.test(chunkHref)) {
-                    mediaType = 'tablet';
+                    mediaType            = 'tablet';
                     break;
                   }
                 }
@@ -171,7 +183,7 @@ module.exports = class MediaQuerySplittingPlugin {
           const newPromisesBottomString  = 'head.appendChild(linkTag);resize();\n})\n)).then'
 
           const hrefString               = 'var href = "" + chunkId + "." + '
-          const mediaTypeString          = 'var href = "" + chunkId + "." + mediaType + "." +'
+          const mediaTypeString          = 'var href = "" + chunkId + (mediaType !== "common" ? "."  + mediaType : "") + "." +'
 
           return source
             .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
@@ -179,7 +191,7 @@ module.exports = class MediaQuerySplittingPlugin {
             .replace(promisesBottomRegExp, newPromisesBottomString)
         }
         else {
-          throw new Error('No chunk loading found! Use mini-css-extract-plugin to handle this error')
+          throw new Error('No chunk loading found! Use mini-css-extract-plugin v0.4.3 to handle this error')
         }
       })
     })
@@ -189,16 +201,17 @@ module.exports = class MediaQuerySplittingPlugin {
 
       // Split each css chunk
       cssChunks.forEach((chunkName) => {
-        const chunkValue     = compilation.assets[chunkName].children[0]._value
-        const splittedValue  = splitByMediaQuery({ cssFile: chunkValue, mediaOptions })
-        const chunkHash      = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
-        const chunkId        = chunkName.replace(/\..*/, '')
+        const chunkValue                 = compilation.assets[chunkName].children[0]._value
+        const splittedValue              = splitByMediaQuery({ cssFile: chunkValue, mediaOptions })
+        const chunkHash                  = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
+        const chunkId                    = chunkName.replace(/\..*/, '')
 
         Object.keys(splittedValue).forEach((mediaType) => {
-          const splittedMediaChunk = splittedValue[mediaType]
+          const splittedMediaChunk       = splittedValue[mediaType]
 
-          if (splittedMediaChunk && (splitTablet || !/tablet(Portrait|Landscape)/.test(mediaType))) {
-            const splittedMediaChunkName = `${chunkId}.${mediaType}.${chunkHash}.css`
+          if (splitTablet || !/tablet(Portrait|Landscape)/.test(mediaType)) {
+            const isCommon               = mediaType === 'common'
+            const splittedMediaChunkName = isCommon ? chunkName : `${chunkId}.${mediaType}.${chunkHash}.css`
 
             // Add chunk to assets
             compilation.assets[splittedMediaChunkName] = {
