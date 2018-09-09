@@ -53,7 +53,7 @@ module.exports = {
 ```
 
 ## Server side rendering
-The plugin splits each css asset to common chunk (which should be always included) and media chunks (for desktop, tablet (portrait and landscape or just tablet) and mobile, which should be included depending on client's device).
+The plugin splits each css asset to common chunk (which should be always included to the response) and media chunk (for desktop, tablet (portrait and landscape or just tablet) and mobile, which should be included depending on client's device).
 
 How to use it with SSR.
 
