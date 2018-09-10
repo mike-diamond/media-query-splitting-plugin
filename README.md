@@ -11,12 +11,12 @@ This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-
 `0.04a9302b77ca5a27bfee.css` - chunk includes all styles and media queries
 
 #### Chunk after applying
-`0.04a9302b77ca5a27bfee.css` - common chunk includes the styles without media query conditions
-`0.desktop.04a9302b77ca5a27bfee.css` - styles for desktop media query, by default it's *(min-width: 1025px)*
-`0.tabletLandscape.04a9302b77ca5a27bfee.css` - *(min-width: 769px) and (max-width: 1024px)*
-`0.tabletPortrait.04a9302b77ca5a27bfee.css` - *(min-width: 569px) and (max-width: 768px)*
-`0.tablet.04a9302b77ca5a27bfee.css` - styles for both tabletLandscape and tabletPortrait
-`0.mobile.04a9302b77ca5a27bfee.css` - *(max-width: 568px)*
+`0.04a9302b77ca5a27bfee.css` - common chunk includes the styles without media query conditions<br/>
+`0.desktop.04a9302b77ca5a27bfee.css` - styles for desktop media query, by default it's *(min-width: 1025px)*<br/>
+`0.tabletLandscape.04a9302b77ca5a27bfee.css` - *(min-width: 769px) and (max-width: 1024px)*<br/>
+`0.tabletPortrait.04a9302b77ca5a27bfee.css` - *(min-width: 569px) and (max-width: 768px)*<br/>
+`0.tablet.04a9302b77ca5a27bfee.css` - styles for both tabletLandscape and tabletPortrait<br/>
+`0.mobile.04a9302b77ca5a27bfee.css` - *(max-width: 568px)*<br/>
 
 
 Also it handles loading of this files depending of the client's screen width, it happens on loading new chunk or on window resize. 
