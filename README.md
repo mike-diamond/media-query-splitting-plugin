@@ -13,7 +13,9 @@ This plugin is addition to mini-css-extract-plugin. It splits styles from style 
 `0.04a9302b77ca5a27bfee.css` - common chunk includes the styles without media query conditions
 `0.desktop.04a9302b77ca5a27bfee.css` - styles for desktop media query, by default it's *(min-width: 1025px)*
 `0.tabletLandscape.04a9302b77ca5a27bfee.css` - styles for tabletLandscape media query, by default it's *(min-width: 769px) and (max-width: 1024px)*
+
 `0.tabletPortrait.04a9302b77ca5a27bfee.css` - styles for tabletPortrait media query, by default it's *(min-width: 569px) and (max-width: 768px)*
+
 `0.tablet.04a9302b77ca5a27bfee.css` - styles for both tabletLandscape and tabletPortrait
 `0.mobile.04a9302b77ca5a27bfee.css` - styles for mobile media query by default it's *(max-width: 568px)*
 
