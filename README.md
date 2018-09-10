@@ -10,7 +10,7 @@ This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-
 #### Chunk before applying
 `0.04a9302b77ca5a27bfee.css` - chunk includes all styles and media queries
 
-#### Chunks after applying
+#### Chunk after applying
 `0.04a9302b77ca5a27bfee.css` - common chunk includes the styles without media query conditions
 `0.desktop.04a9302b77ca5a27bfee.css` - styles for desktop media query, by default it's *(min-width: 1025px)*
 `0.tabletLandscape.04a9302b77ca5a27bfee.css` - *(min-width: 769px) and (max-width: 1024px)*
