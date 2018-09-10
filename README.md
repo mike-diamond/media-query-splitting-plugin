@@ -5,7 +5,7 @@ Webpack 4 plugin for styles splitting by media query
 [![Month Downloads](https://img.shields.io/npm/dm/media-query-splitting-plugin.svg)](http://npm-stat.com/charts.html?package=media-query-splitting-plugin)
 [![Npm Licence](https://img.shields.io/npm/l/media-query-splitting-plugin.svg)](https://www.npmjs.com/package/media-query-splitting-plugin)
 
-This plugin is addition to mini-css-extract-plugin. It splits styles from style chunks by media query and creates separate CSS files for mobile, tablet and desktop.
+This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin). It splits styles from style chunks by media query and creates separate CSS files for mobile, tablet and desktop.
 
 #### Chunk before applying
 `0.04a9302b77ca5a27bfee.css` - chunk includes all styles and media queries
@@ -70,7 +70,7 @@ The plugin splits each css asset to common chunk (which should be always include
 
 How to use it with SSR.
 
-All you need is to define client device type (mobile, tablet or desktop) and add style chunk for this device in addition the to common chunk. Define device type depending on req.headers['user-agent'] (use express-device middleware for it).
+All you need is to define client device type (mobile, tablet or desktop) and add style chunk for this device in addition the to common chunk. Define device type depending on req.headers\['user-agent'\] (use express-device middleware for it).
 
 ### Example:
 ```js
