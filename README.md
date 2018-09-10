@@ -21,6 +21,29 @@ This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-
 
 Also it handles loading of this files depending of the client's screen width, it happens on loading new chunk or on window resize. 
 
+
+
+## Options
+This is default options, it can be omitted.
+
+```js
+{
+  media: {
+    mobileEnd: 568,
+    tabletPortraitEnd: 768,
+    tabletLandscapeEnd: 1024,
+  },
+  splitTablet: true,
+}
+```
+You can define your own media breakpoints in the media option.
+Also if you define `splitTablet: false` on the client side won't be used tabletPortrait or tabletLandscape styles. Instead will be used tablet style which includes both landscape and portrait.
+
+Also pay attention that on server side we can't define by user-agent which tablet version the client used - landscape or portrait, that's why we send tablet version in the response. After user receives that response, the next chunk loading happens on client side (for example when user go to another page of our app), so than we can match browser media and load suitable tablet version.
+
+
+
+
 ## Install
 
 ```bash
@@ -70,7 +93,7 @@ The plugin splits each css asset to common chunk (which should be always include
 
 How to use it with SSR.
 
-All you need is to define client device type (mobile, tablet or desktop) and add style chunk for this device in addition the to common chunk. Define device type depending on req.headers\['user-agent'\] (use express-device middleware for it).
+All you need is to define client device type (mobile, tablet or desktop) and add style chunk for this device in addition to  the common chunk. For example if you use express.js you can define device type depending on req.headers\['user-agent'\] (use [express-device](https://github.com/rguerreiro/express-device) middleware to handle it).
 
 ### Example:
 ```js
