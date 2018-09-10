@@ -39,7 +39,7 @@ This is default options, it can be omitted.
 You can define your own media breakpoints in the media option.
 Also if you define `splitTablet: false` on the client side won't be used tabletPortrait or tabletLandscape styles. Instead will be used tablet style which includes both landscape and portrait.
 
-Also pay attention that on server side we can't define by user-agent which tablet version the client used - landscape or portrait, that's why we send tablet version in the response. After user receives that response, the next chunk loading happens on client side (for example when user go to another page of our app), so than we can match browser media and load suitable tablet version.
+Pay attention that on server side we can't define by user-agent which tablet version the client used - landscape or portrait, that's why we send tablet version in the response. After user receives that response, the next chunk loading happens on client side (for example when user go to another page of our app), so than we can match browser media and load suitable tablet version.
 
 
 
