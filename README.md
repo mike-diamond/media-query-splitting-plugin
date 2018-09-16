@@ -1,5 +1,6 @@
 # <img src="./images/logo.png" height="30" /> media-query-splitting-plugin
-Webpack 4 plugin for styles splitting by media query
+Webpack 4 plugin for styles splitting by media query.
+[Demo](https://mediaquerysplittingdemo.firebaseapp.com/)
 
 [![Npm Version](https://badge.fury.io/js/media-query-splitting-plugin.svg)](https://www.npmjs.com/package/media-query-splitting-plugin)
 [![Month Downloads](https://img.shields.io/npm/dm/media-query-splitting-plugin.svg)](http://npm-stat.com/charts.html?package=media-query-splitting-plugin)
