@@ -1,6 +1,6 @@
 {
   "name": "media-query-splitting-plugin",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Webpack 4 plugin for styles splitting by media query",
   "main": "src/index.js",
   "scripts": {

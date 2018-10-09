@@ -8,6 +8,9 @@ Webpack 4 plugin for styles splitting by media query.
 
 This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin). It splits styles from style chunks by media query and creates separate CSS files for mobile, tablet and desktop.
 
+#### Instalation
+`npm install --save-dev media-query-splitting-plugin`
+
 #### Chunk before applying
 `0.04a9302b77ca5a27bfee.css` - chunk includes all styles and media queries
 
