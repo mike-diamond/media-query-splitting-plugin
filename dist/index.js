@@ -1,1 +1,231 @@
-"use strict";function _classCallCheck(e,n){if(!(e instanceof n))throw new TypeError("Cannot call a class as a function")}function _defineProperties(e,n){for(var t=0;t<n.length;t++){var a=n[t];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}function _createClass(e,n,t){return n&&_defineProperties(e.prototype,n),t&&_defineProperties(e,t),e}var splitByMediaQuery=require("./splitByMediaQuery");module.exports=function(){function e(n){_classCallCheck(this,e);var t=n||{},a=t.media,i=void 0===a?{}:a,r=t.splitTablet;this.options={media:{mobileEnd:i.mobileEnd||568,tabletPortraitStart:i.mobileEnd?i.mobileEnd+1:569,tabletPortraitEnd:i.tabletPortraitEnd||768,tabletLandscapeStart:i.tabletPortraitEnd?i.tabletPortraitEnd+1:769,tabletLandscapeEnd:i.tabletLandscapeEnd||1024,desktopStart:i.tabletLandscapeEnd?i.tabletLandscapeEnd+1:1025},splitTablet:!1!==r}}return _createClass(e,[{key:"apply",value:function(e){var n=this.options,t=n.media,a=n.splitTablet;e.hooks.thisCompilation.tap("media-query-splitting-plugin",function(e){e.mainTemplate.hooks.requireEnsure.tap("media-query-splitting-plugin",function(e,n,i){if(/mini-css-extract-plugin CSS loading/.test(e)){var r='\n            // matchMedia polyfill\n            window.matchMedia||(window.matchMedia=function(){"use strict";var e=window.styleMedia||window.media;if(!e){var t,d=document.createElement("style"),i=document.getElementsByTagName("script")[0];d.type="text/css",d.id="matchmediajs-test",i?i.parentNode.insertBefore(d,i):document.head.appendChild(d),t="getComputedStyle"in window&&window.getComputedStyle(d,null)||d.currentStyle,e={matchMedium:function(e){var i="@media "+e+"{ #matchmediajs-test { width: 1px; } }";return d.styleSheet?d.styleSheet.cssText=i:d.textContent=i,"1px"===t.width}}}return function(t){return{matches:e.matchMedium(t||"all"),media:t||"all"}}}());\n            \n            // Define current mediaType\n            var getMediaType = function() {\n              return {\n                isMobile: window.matchMedia(\'(max-width: '.concat(t.mobileEnd,"px)').matches,\n                isTabletPortrait: window.matchMedia('(min-width: ").concat(t.tabletPortraitStart,"px) and (max-width: ").concat(t.tabletPortraitEnd,"px)').matches,\n                isTabletLandscape: window.matchMedia('(min-width: ").concat(t.tabletLandscapeStart,"px) and (max-width: ").concat(t.tabletLandscapeEnd,"px)').matches,\n                isDesktop: window.matchMedia('(min-width: ").concat(t.desktopStart,"px)').matches,\n              }\n            };\n\n            var mediaType                = getMediaType();\n            var currentMediaType         = 'desktop';\n\n            if (mediaType.isMobile) {\n              currentMediaType           = 'mobile'\n            }\n            ").concat(a?"\n                else if (mediaType.isTabletPortrait) {\n                  currentMediaType       = 'tabletPortrait'\n                }\n                else if (mediaType.isTabletLandscape) {\n                  currentMediaType       = 'tabletLandscape'\n                }":"\n                else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {\n                  currentMediaType       = 'tablet'\n                }\n              ","\n\n            var tryAppendNewMedia = function() {\n              var linkElements           = document.getElementsByTagName('link');\n              var chunkIds               = {};\n              \n              for (var i = 0; i < linkElements.length; i++) {\n                var chunkHref            = linkElements[i].href.replace(/.*\\//, '');\n                \n                if (/(mobile|tablet|desktop).*\\.css$/.test(chunkHref)) {\n                  var chunkId            = chunkHref.replace(/\\..*/, '');\n                  var chunkMediaType     = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');\n                  var chunkHash          = chunkHref.replace(/\\.css$/, '').replace('' + chunkId + '.' + chunkMediaType + '.', '');\n                  var chunkHrefPrefix    = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');\n  \n                  if (!chunkIds[chunkId]) {\n                    chunkIds[chunkId]    = {\n                      mediaTypes: [ chunkMediaType ],\n                      hash: chunkHash,\n                      prefix: chunkHrefPrefix,\n                    }\n                  }\n                  else {\n                    chunkIds[chunkId].mediaTypes.push(chunkMediaType);\n                  }\n                }\n              }\n\n              for (var i in chunkIds) {\n                if (chunkIds.hasOwnProperty(i)) {\n                  var isTablet           = /tablet/.test(currentMediaType);\n                  var hasTablet          = chunkIds[i].mediaTypes.indexOf('tablet') !== -1;\n                  var _hasCurrentMedia   = chunkIds[i].mediaTypes.indexOf(currentMediaType) !== -1;\n                  var hasCurrentMedia    = isTablet ? hasTablet || _hasCurrentMedia : _hasCurrentMedia;\n                  \n                  if (!hasCurrentMedia) {\n                    var fullhref         = '' + chunkIds[i].prefix + '' + i + '.' + currentMediaType + '.' + chunkIds[i].hash + '.css';\n                    var linkTag          = document.createElement('link');\n                    var header           = document.getElementsByTagName('head')[0];\n\n                    linkTag.rel          = 'stylesheet';\n                    linkTag.type         = 'text/css';\n                    linkTag.href         = fullhref;\n\n                    header.appendChild(linkTag);\n                  }\n                }\n              }\n            };\n\n            var resize = function() {\n              var newMediaType\n              var mediaType              = getMediaType();\n\n              if (mediaType.isMobile) {\n                newMediaType             = 'mobile'\n              }\n              ").concat(a?"\n                  else if (mediaType.isTabletPortrait) {\n                    newMediaType         = 'tabletPortrait'\n                  }\n                  else if (mediaType.isTabletLandscape) {\n                    newMediaType         = 'tabletLandscape'\n                  }":"else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {\n                    newMediaType         = 'tablet'\n                  }","\n              else {\n                newMediaType             = 'desktop'\n              }\n\n              if (currentMediaType !== newMediaType) {\n                currentMediaType         = newMediaType;\n              }\n              \n              tryAppendNewMedia()\n            };\n\n            document.addEventListener('DOMContentLoaded', function() {\n              window.addEventListener('resize', resize);\n              resize();\n            });\n          ");return e.replace("promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {","".concat(r).concat("promises.push(installedCssChunks[chunkId] = Promise.all([ 'common', currentMediaType ]\n            .map((mediaType) => new Promise(function(resolve, reject) {\n              \n              // Don't load tabletPortrait or tabletLandscape if there is tablet style\n              if (/tablet/.test(mediaType)) {\n                var linkElements         = document.getElementsByTagName('link');\n                var hasTabletStyle       = false;\n\n                for (var i = 0; i < linkElements.length; i++) {\n                  var chunkHref          = linkElements[i].href.replace(/.*\\//, '');\n                  var currentChunkRegExp = new RegExp('^' + chunkId + '\\\\' + '.tablet' + '\\\\' + '.') \n                  \n                  if (currentChunkRegExp.test(chunkHref)) {\n                    mediaType            = 'tablet';\n                    break;\n                  }\n                }\n              }\n          ")).replace('var href = "" + chunkId + "." + ','var href = "" + chunkId + (mediaType !== "common" ? "."  + mediaType : "") + "." +').replace(/head\.appendChild\(linkTag\);(.|\n)*}\)\.then/,"head.appendChild(linkTag);resize();\n})\n)).then")}throw new Error("No chunk loading found! Use mini-css-extract-plugin v0.4.3 to handle this error")})}),e.plugin("emit",function(e,n){Object.keys(e.assets).filter(function(e){return/\.css$/.test(e)}).forEach(function(n){var i=e.assets[n].children[0]._value,r=splitByMediaQuery({cssFile:i,mediaOptions:t}),d=n.replace(/\.css$/,"").replace(/.*\./,""),s=n.replace(/\..*/,"");Object.keys(r).forEach(function(t){var i=r[t];if(a||!/tablet(Portrait|Landscape)/.test(t)){var c="common"===t?n:"".concat(s,".").concat(t,".").concat(d,".css");e.assets[c]={size:function(){return Buffer.byteLength(i,"utf8")},source:function(){return new Buffer(i)}}}})}),n()})}}]),e}();
+const splitByMediaQuery  = require('./splitByMediaQuery')
+
+
+module.exports = class MediaQuerySplittingPlugin {
+
+  constructor(options) {
+    const { media = {}, splitTablet } = options || {}
+
+    this.options = {
+      media: {
+        mobileEnd: media.mobileEnd || 568,
+        tabletPortraitStart: media.mobileEnd ? media.mobileEnd + 1 : 569,
+        tabletPortraitEnd: media.tabletPortraitEnd || 768,
+        tabletLandscapeStart: media.tabletPortraitEnd ? media.tabletPortraitEnd + 1 : 769,
+        tabletLandscapeEnd: media.tabletLandscapeEnd || 1024,
+        desktopStart: media.tabletLandscapeEnd ? media.tabletLandscapeEnd + 1 : 1025,
+      },
+      splitTablet: splitTablet !== false,
+    }
+  }
+
+  apply(compiler) {
+    const { media: mediaOptions, splitTablet } = this.options
+
+    const pluginName = 'media-query-splitting-plugin'
+
+    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
+      compilation.mainTemplate.hooks.requireEnsure.tap(pluginName, (source, chunk, hash) => {
+        const hasChunkLodaing = /mini-css-extract-plugin CSS loading/.test(source)
+
+        if (hasChunkLodaing) {
+          // let chunks                     = source.replace(/(.|\n)*var href = "" \+ chunkId \+ "\." \+ /, '').replace(/\[chunkId\](.|\n)*/, '')
+          //
+          // try {
+          //   chunks                       = JSON.parse(chunks)
+          //   chunks                       = Object.values(chunks)
+          // }
+          // catch (err) {
+          //   throw new Error('Parse chunks error. Try use mini-css-extract-plugin v0.4.3')
+          // }
+
+          const matchMediaPolyfill       = `
+            // matchMedia polyfill
+            window.matchMedia||(window.matchMedia=function(){"use strict";var e=window.styleMedia||window.media;if(!e){var t,d=document.createElement("style"),i=document.getElementsByTagName("script")[0];d.type="text/css",d.id="matchmediajs-test",i?i.parentNode.insertBefore(d,i):document.head.appendChild(d),t="getComputedStyle"in window&&window.getComputedStyle(d,null)||d.currentStyle,e={matchMedium:function(e){var i="@media "+e+"{ #matchmediajs-test { width: 1px; } }";return d.styleSheet?d.styleSheet.cssText=i:d.textContent=i,"1px"===t.width}}}return function(t){return{matches:e.matchMedium(t||"all"),media:t||"all"}}}());
+            
+            // Define current mediaType
+            var getMediaType = function() {
+              return {
+                isMobile: window.matchMedia('(max-width: ${mediaOptions.mobileEnd}px)').matches,
+                isTabletPortrait: window.matchMedia('(min-width: ${mediaOptions.tabletPortraitStart}px) and (max-width: ${mediaOptions.tabletPortraitEnd}px)').matches,
+                isTabletLandscape: window.matchMedia('(min-width: ${mediaOptions.tabletLandscapeStart}px) and (max-width: ${mediaOptions.tabletLandscapeEnd}px)').matches,
+                isDesktop: window.matchMedia('(min-width: ${mediaOptions.desktopStart}px)').matches,
+              }
+            };
+
+            var mediaType                = getMediaType();
+            var currentMediaType         = 'desktop';
+
+            if (mediaType.isMobile) {
+              currentMediaType           = 'mobile'
+            }
+            ${splitTablet
+            ? `
+                else if (mediaType.isTabletPortrait) {
+                  currentMediaType       = 'tabletPortrait'
+                }
+                else if (mediaType.isTabletLandscape) {
+                  currentMediaType       = 'tabletLandscape'
+                }`
+            : `
+                else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {
+                  currentMediaType       = 'tablet'
+                }
+              `
+            }
+
+            var tryAppendNewMedia = function() {
+              var linkElements           = document.getElementsByTagName('link');
+              var chunkIds               = {};
+              
+              for (var i = 0; i < linkElements.length; i++) {
+                var chunkHref            = linkElements[i].href.replace(/.*\\//, '');
+                
+                if (/(mobile|tablet|desktop).*\\.css$/.test(chunkHref)) {
+                  var chunkId            = chunkHref.replace(/\\..*/, '');
+                  var chunkMediaType     = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
+                  var chunkHash          = chunkHref.replace(/\\.css$/, '').replace('' + chunkId + '.' + chunkMediaType + '.', '');
+                  var chunkHrefPrefix    = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');
+  
+                  if (!chunkIds[chunkId]) {
+                    chunkIds[chunkId]    = {
+                      mediaTypes: [ chunkMediaType ],
+                      hash: chunkHash,
+                      prefix: chunkHrefPrefix,
+                    }
+                  }
+                  else {
+                    chunkIds[chunkId].mediaTypes.push(chunkMediaType);
+                  }
+                }
+              }
+
+              for (var i in chunkIds) {
+                if (chunkIds.hasOwnProperty(i)) {
+                  var isTablet           = /tablet/.test(currentMediaType);
+                  var hasTablet          = chunkIds[i].mediaTypes.indexOf('tablet') !== -1;
+                  var _hasCurrentMedia   = chunkIds[i].mediaTypes.indexOf(currentMediaType) !== -1;
+                  var hasCurrentMedia    = isTablet ? hasTablet || _hasCurrentMedia : _hasCurrentMedia;
+                  
+                  if (!hasCurrentMedia) {
+                    var fullhref         = '' + chunkIds[i].prefix + '' + i + '.' + currentMediaType + '.' + chunkIds[i].hash + '.css';
+                    var linkTag          = document.createElement('link');
+                    var header           = document.getElementsByTagName('head')[0];
+
+                    linkTag.rel          = 'stylesheet';
+                    linkTag.type         = 'text/css';
+                    linkTag.href         = fullhref;
+
+                    header.appendChild(linkTag);
+                  }
+                }
+              }
+            };
+
+            var resize = function() {
+              var newMediaType
+              var mediaType              = getMediaType();
+
+              if (mediaType.isMobile) {
+                newMediaType             = 'mobile'
+              }
+              ${splitTablet
+            ? `
+                  else if (mediaType.isTabletPortrait) {
+                    newMediaType         = 'tabletPortrait'
+                  }
+                  else if (mediaType.isTabletLandscape) {
+                    newMediaType         = 'tabletLandscape'
+                  }`
+            : `else if (mediaType.isTabletPortrait || mediaType.isTabletLandscape) {
+                    newMediaType         = 'tablet'
+                  }`
+            }
+              else {
+                newMediaType             = 'desktop'
+              }
+
+              if (currentMediaType !== newMediaType) {
+                currentMediaType         = newMediaType;
+              }
+              
+              tryAppendNewMedia()
+            };
+
+            document.addEventListener('DOMContentLoaded', function() {
+              window.addEventListener('resize', resize);
+              resize();
+            });
+          `
+
+          const promisesString           = 'promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {'
+          const newPromisesString        = `promises.push(installedCssChunks[chunkId] = Promise.all([ \'common\', currentMediaType ]
+            .map((mediaType) => new Promise(function(resolve, reject) {
+              
+              // Don't load tabletPortrait or tabletLandscape if there is tablet style
+              if (/tablet/.test(mediaType)) {
+                var linkElements         = document.getElementsByTagName('link');
+                var hasTabletStyle       = false;
+
+                for (var i = 0; i < linkElements.length; i++) {
+                  var chunkHref          = linkElements[i].href.replace(/.*\\//, '');
+                  var currentChunkRegExp = new RegExp('^' + chunkId + '\\\\' + '.tablet' + '\\\\' + '.') 
+                  
+                  if (currentChunkRegExp.test(chunkHref)) {
+                    mediaType            = 'tablet';
+                    break;
+                  }
+                }
+              }
+          `
+
+          const promisesBottomRegExp     = /head\.appendChild\(linkTag\);(.|\n)*}\)\.then/
+          const newPromisesBottomString  = 'head.appendChild(linkTag);resize();\n})\n)).then'
+
+          const hrefString               = 'var href = "" + chunkId + "." + '
+          const mediaTypeString          = 'var href = "" + chunkId + (mediaType !== "common" ? "."  + mediaType : "") + "." +'
+
+          return source
+            .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
+            .replace(hrefString, mediaTypeString)
+            .replace(promisesBottomRegExp, newPromisesBottomString)
+        }
+        else {
+          throw new Error('No chunk loading found! Use mini-css-extract-plugin v0.4.3 to handle this error')
+        }
+      })
+    })
+
+    compiler.plugin('emit', (compilation, callback) => {
+      const cssChunks = Object.keys(compilation.assets).filter((asset) => /\.css$/.test(asset))
+      console.log('SRC', { asset: compilation.assets[cssChunks[0]] })
+
+      // Split each css chunk
+      cssChunks.forEach((chunkName) => {
+        const asset                      = compilation.assets[chunkName]
+        const child                      = asset.children && asset.children[0]
+        const chunkValue                 = (child || asset)._value
+        const splittedValue              = splitByMediaQuery({ cssFile: chunkValue, mediaOptions })
+        const chunkHash                  = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
+        const chunkId                    = chunkName.replace(/\..*/, '')
+
+        Object.keys(splittedValue).forEach((mediaType) => {
+          const splittedMediaChunk       = splittedValue[mediaType]
+
+          if (splitTablet || !/tablet(Portrait|Landscape)/.test(mediaType)) {
+            const isCommon               = mediaType === 'common'
+            const splittedMediaChunkName = isCommon ? chunkName : `${chunkId}.${mediaType}.${chunkHash}.css`
+
+            // Add chunk to assets
+            compilation.assets[splittedMediaChunkName] = {
+              size: () => Buffer.byteLength(splittedMediaChunk, 'utf8'),
+              source: () => new Buffer(splittedMediaChunk)
+            }
+          }
+        })
+      })
+
+      callback()
+    })
+  }
+}

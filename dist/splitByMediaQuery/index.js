@@ -1,1 +1,84 @@
-"use strict";var css=require("css"),CleanCSS=require("clean-css"),matchMedia=require("./matchMedia");module.exports=function(e){var s=e.cssFile,t=e.mediaOptions,a={},i=css.parse(s).stylesheet.rules,r={common:[],desktop:[],mobile:[],tabletPortrait:[],tabletLandscape:[],tablet:[]};return i.forEach(function(e,s){var a=e.type,o=e.media,n=matchMedia({mediaQuery:o,mediaOptions:t}),c=n.isDesktop,l=n.isTablet,u=n.isTabletLandscape,p=n.isTabletPortrait,m=n.isMobile,h=i[s],d=!c&&!l&&!m;"media"===a?(c&&r.desktop.push(h),u&&(r.tablet.push(h),r.tabletLandscape.push(h)),p&&(r.tablet.push(h),r.tabletPortrait.push(h)),m&&r.mobile.push(h),d&&r.common.push(h)):r.common.push(h)}),Object.keys(r).forEach(function(e){a[e]=[],r[e].forEach(function(s,t){var i=s.media,r=s.rules,o=(s.position,a[e].map(function(e){return e.media}).indexOf(i));!i||o<0?a[e].push(s):a[e][o].rules=a[e][o].rules.concat(r)});var s=css.stringify({type:"stylesheet",stylesheet:{rules:a[e]}});a[e]=(new CleanCSS).minify(s).styles}),a};
+const css            = require('css')
+const CleanCSS       = require('clean-css')
+
+const matchMedia     = require('./matchMedia')
+
+
+module.exports = ({ cssFile, mediaOptions }) => {
+  const output       = {}
+  const inputRules   = css.parse(cssFile).stylesheet.rules
+  const outputRules  = {
+    common: [],
+    desktop: [],
+    mobile: [],
+    tabletPortrait: [],
+    tabletLandscape: [],
+    tablet: [],
+  }
+
+  inputRules.forEach(({ type, media }, index) => {
+    const {
+      isDesktop,
+      isTablet,
+      isTabletLandscape,
+      isTabletPortrait,
+      isMobile,
+    } = matchMedia({ mediaQuery: media, mediaOptions })
+
+    const rule       = inputRules[index]
+    const isNoMatch  = !isDesktop && !isTablet && !isMobile
+
+    if (type === 'media') {
+      if (isDesktop) {
+        outputRules.desktop.push(rule)
+      }
+      if (isTabletLandscape) {
+        outputRules.tablet.push(rule)
+        outputRules.tabletLandscape.push(rule)
+      }
+      if (isTabletPortrait) {
+        outputRules.tablet.push(rule)
+        outputRules.tabletPortrait.push(rule)
+      }
+      if (isMobile) {
+        outputRules.mobile.push(rule)
+      }
+      if (isNoMatch) {
+        outputRules.common.push(rule)
+      }
+    }
+    else {
+      outputRules.common.push(rule)
+    }
+  })
+
+  Object.keys(outputRules).forEach((key) => {
+    output[key]      = []
+    const rules      = outputRules[key]
+
+    // Merge duplicates media conditions
+    rules.forEach((rule, index) => {
+      const { media, rules, position } = rule
+
+      const mediaIndex = output[key].map(({ media }) => media).indexOf(media)
+
+      if (!media || mediaIndex < 0) {
+        output[key].push(rule)
+      }
+      else {
+        output[key][mediaIndex].rules = output[key][mediaIndex].rules.concat(rules)
+      }
+    })
+
+    // Stringify styles
+    const style = css.stringify({
+      type: 'stylesheet',
+      stylesheet: { rules: output[key] }
+    })
+
+    // Minify styles
+    output[key] = (new CleanCSS().minify(style)).styles
+  })
+
+  return output
+}

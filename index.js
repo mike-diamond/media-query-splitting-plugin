@@ -1,3 +1,3 @@
-const plugin = require('./dist');
+const plugin = require('./src');
 
 module.exports = plugin;
