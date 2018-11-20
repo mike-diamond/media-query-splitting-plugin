@@ -198,7 +198,6 @@ module.exports = class MediaQuerySplittingPlugin {
 
     compiler.plugin('emit', (compilation, callback) => {
       const cssChunks = Object.keys(compilation.assets).filter((asset) => /\.css$/.test(asset))
-      console.log('SRC', { asset: compilation.assets[cssChunks[0]] })
 
       // Split each css chunk
       cssChunks.forEach((chunkName) => {
