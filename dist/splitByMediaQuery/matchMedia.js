@@ -1,4 +1,5 @@
-module.exports = ({ mediaQuery, mediaOptions }) => {
+module.exports = ({ mediaQuery: _mediaQuery = '', mediaOptions }) => {
+  const mediaQuery                = _mediaQuery.replace(/:/, ': ').replace(':  ', ': ')
   const desktop                   = `(min-width: ${mediaOptions.desktopStart}px)`
   const tabletLandscape           = `(min-width: ${mediaOptions.tabletLandscapeStart}px) and (max-width: ${mediaOptions.tabletLandscapeEnd}px)`
   const tablet                    = `(min-width: ${mediaOptions.tabletPortraitStart}px) and (max-width: ${mediaOptions.tabletLandscapeEnd}px)`
