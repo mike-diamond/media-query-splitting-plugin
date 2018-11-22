@@ -122,7 +122,7 @@ All you need is to define client device type (mobile, tablet or desktop) and add
           mediaType       = 'tablet'
         }
 
-        const chunkId     = publicPath.replace(/\..*/, '')
+        const chunkId     = publicPath.replace(/.*\//,'').replace(/\..*/, '')
         const mediaPath   = publicPath.replace(chunkId, `${chunkId}.${mediaType}`)
 
         return `
