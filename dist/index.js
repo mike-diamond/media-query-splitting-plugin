@@ -203,7 +203,7 @@ module.exports = class MediaQuerySplittingPlugin {
       cssChunks.forEach((chunkName) => {
         const asset                      = compilation.assets[chunkName]
         const child                      = asset.children && asset.children[0]
-        const chunkValue                 = (child || asset)._value
+        const chunkValue                 = typeof asset.source === 'function' ? asset.source() : (child || asset)._value
         const splittedValue              = splitByMediaQuery({ cssFile: chunkValue, mediaOptions })
         const chunkHash                  = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
         const chunkId                    = chunkName.replace(/\..*/, '')
