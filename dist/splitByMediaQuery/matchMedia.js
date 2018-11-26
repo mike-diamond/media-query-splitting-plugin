@@ -36,8 +36,6 @@ module.exports = ({ mediaQuery: _mediaQuery = '', mediaOptions }) => {
     || mediaQuery === tabletLandscapeAndHigher
     || mediaQuery === tabletPortraitAndHigher
     || mediaQuery === exceptMobile
-    || mediaQuery === retina2x
-    || mediaQuery === retina3x
     || mediaQuery === retina2xDesktop
     || mediaQuery === retina3xDesktop
     || mediaQuery === retina2xExceptMobile
