@@ -160,27 +160,28 @@ module.exports = class MediaQuerySplittingPlugin {
 
           const promisesString           = 'promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {'
           const newPromisesString        = `promises.push(installedCssChunks[chunkId] = Promise.all([ \'common\', currentMediaType ]
-            .map((mediaType) => new Promise(function(resolve, reject) {
-              
-              // Don't load tabletPortrait or tabletLandscape if there is tablet style
-              if (/tablet/.test(mediaType)) {
-                var linkElements         = document.getElementsByTagName('link');
-                var hasTabletStyle       = false;
-
-                for (var i = 0; i < linkElements.length; i++) {
-                  var chunkHref          = linkElements[i].href.replace(/.*\\//, '');
-                  var currentChunkRegExp = new RegExp('^' + chunkId + '\\\\' + '.tablet' + '\\\\' + '.') 
-                  
-                  if (currentChunkRegExp.test(chunkHref)) {
-                    mediaType            = 'tablet';
-                    break;
+            .map(function (mediaType) {
+              return new Promise(function(resolve, reject) {
+                
+                // Don't load tabletPortrait or tabletLandscape if there is tablet style
+                if (/tablet/.test(mediaType)) {
+                  var linkElements         = document.getElementsByTagName('link');
+                  var hasTabletStyle       = false;
+  
+                  for (var i = 0; i < linkElements.length; i++) {
+                    var chunkHref          = linkElements[i].href.replace(/.*\\//, '');
+                    var currentChunkRegExp = new RegExp('^' + chunkId + '\\\\' + '.tablet' + '\\\\' + '.') 
+                    
+                    if (currentChunkRegExp.test(chunkHref)) {
+                      mediaType            = 'tablet';
+                      break;
+                    }
                   }
                 }
-              }
           `
 
           const promisesBottomRegExp     = /head\.appendChild\(linkTag\);(.|\n)*}\)\.then/
-          const newPromisesBottomString  = 'head.appendChild(linkTag);resize();\n})\n)).then'
+          const newPromisesBottomString  = 'head.appendChild(linkTag);resize();\n})\n})).then'
 
           const hrefString               = 'var href = "" + chunkId + "." + '
           const mediaTypeString          = 'var href = "" + chunkId + (mediaType !== "common" ? "."  + mediaType : "") + "." +'
