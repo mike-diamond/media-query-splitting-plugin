@@ -162,7 +162,6 @@ module.exports = class MediaQuerySplittingPlugin {
           const newPromisesString        = `promises.push(installedCssChunks[chunkId] = Promise.all([ \'common\', currentMediaType ]
             .map(function (mediaType) {
               return new Promise(function(resolve, reject) {
-                
                 // Don't load tabletPortrait or tabletLandscape if there is tablet style
                 if (/tablet/.test(mediaType)) {
                   var linkElements         = document.getElementsByTagName('link');
@@ -183,8 +182,8 @@ module.exports = class MediaQuerySplittingPlugin {
           const promisesBottomRegExp     = /head\.appendChild\(linkTag\);(.|\n)*}\)\.then/
           const newPromisesBottomString  = 'head.appendChild(linkTag);resize();\n})\n})).then'
 
-          const hrefString               = 'var href = "" + chunkId + "." + '
-          const mediaTypeString          = 'var href = "" + chunkId + (mediaType !== "common" ? "."  + mediaType : "") + "." +'
+          const hrefString               = source.replace(/(.|\n)*var href = \"/, '').replace(/\";(.|\n)*/, '')
+          const mediaTypeString          = hrefString.replace(/ chunkId /, ' chunkId + (mediaType !== "common" ? "."  + mediaType : "") ')
 
           return source
             .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
