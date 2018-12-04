@@ -25,10 +25,8 @@ module.exports = class MediaQuerySplittingPlugin {
     const pluginName = 'media-query-splitting-plugin'
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
-      compilation.mainTemplate.hooks.requireEnsure.tap(pluginName, (source, chunk, hash) => {
-        const hasChunkLodaing = /mini-css-extract-plugin CSS loading/.test(source)
-
-        if (hasChunkLodaing) {
+      compilation.mainTemplate.hooks.requireEnsure.tap(pluginName, (source) => {
+        if (source) {
           // let chunks                     = source.replace(/(.|\n)*var href = "" \+ chunkId \+ "\." \+ /, '').replace(/\[chunkId\](.|\n)*/, '')
           //
           // try {
@@ -189,9 +187,6 @@ module.exports = class MediaQuerySplittingPlugin {
             .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
             .replace(hrefString, mediaTypeString)
             .replace(promisesBottomRegExp, newPromisesBottomString)
-        }
-        else {
-          throw new Error('No chunk loading found! Use mini-css-extract-plugin v0.4.3 to handle this error')
         }
       })
     })
