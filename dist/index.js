@@ -1,26 +1,55 @@
-const splitByMediaQuery  = require('./splitByMediaQuery')
+import splitByMediaQuery from './splitByMediaQuery'
 
 
-module.exports = class MediaQuerySplittingPlugin {
+export default class MediaQuerySplittingPlugin {
 
   constructor(options) {
-    const { media = {}, splitTablet } = options || {}
+    const { media = {}, units = 'px', minify = true, splitTablet } = options || {}
 
-    this.options = {
-      media: {
-        mobileEnd: media.mobileEnd || 568,
-        tabletPortraitStart: media.mobileEnd ? media.mobileEnd + 1 : 569,
-        tabletPortraitEnd: media.tabletPortraitEnd || 768,
-        tabletLandscapeStart: media.tabletPortraitEnd ? media.tabletPortraitEnd + 1 : 769,
-        tabletLandscapeEnd: media.tabletLandscapeEnd || 1024,
-        desktopStart: media.tabletLandscapeEnd ? media.tabletLandscapeEnd + 1 : 1025,
-      },
-      splitTablet: splitTablet !== false,
+    const isOldConfig = (
+      !Object.keys(media).length
+      || Object.values(media).every((value) => Number(value) >= 0)
+    )
+
+    if (isOldConfig) {
+      this.options = {
+        units,
+        minify,
+        media: {
+          mobileEnd: media.mobileEnd || 568,
+          tabletPortraitStart: media.mobileEnd ? media.mobileEnd + 1 : 569,
+          tabletPortraitEnd: media.tabletPortraitEnd || 768,
+          tabletLandscapeStart: media.tabletPortraitEnd ? media.tabletPortraitEnd + 1 : 769,
+          tabletLandscapeEnd: media.tabletLandscapeEnd || 1024,
+          desktopStart: media.tabletLandscapeEnd ? media.tabletLandscapeEnd + 1 : 1025,
+        },
+        splitTablet: splitTablet !== false,
+      }
+    }
+    else {
+      this.options = {
+        minify,
+        // media: {
+        //   mobile: '(max-width: 568px)',
+        //   tabletPortrait: '(min-width: 569px) and (max-width: 768px)',
+        //   tabletLandscape: '(min-width: 769px) and (max-width: 1024px)',
+        //   desktop: '(min-width: 1025px)',
+        // },
+        media: {
+          mobile: {
+            query: '(max-width: 568px)',
+            exact: true,
+          },
+          tabletPortrait: '(min-width: 569px) and (max-width: 768px)',
+          tabletLandscape: '(min-width: 769px) and (max-width: 1024px)',
+          desktop: '(min-width: 1025px)',
+        },
+      }
     }
   }
 
   apply(compiler) {
-    const { media: mediaOptions, splitTablet } = this.options
+    const { media: mediaOptions, splitTablet, minify, units } = this.options
 
     const pluginName = 'media-query-splitting-plugin'
 
@@ -44,10 +73,10 @@ module.exports = class MediaQuerySplittingPlugin {
             // Define current mediaType
             var getMediaType = function() {
               return {
-                isMobile: window.matchMedia('(max-width: ${mediaOptions.mobileEnd}px)').matches,
-                isTabletPortrait: window.matchMedia('(min-width: ${mediaOptions.tabletPortraitStart}px) and (max-width: ${mediaOptions.tabletPortraitEnd}px)').matches,
-                isTabletLandscape: window.matchMedia('(min-width: ${mediaOptions.tabletLandscapeStart}px) and (max-width: ${mediaOptions.tabletLandscapeEnd}px)').matches,
-                isDesktop: window.matchMedia('(min-width: ${mediaOptions.desktopStart}px)').matches,
+                isMobile: window.matchMedia('(max-width: ${mediaOptions.mobileEnd}${units})').matches,
+                isTabletPortrait: window.matchMedia('(min-width: ${mediaOptions.tabletPortraitStart}${units}) and (max-width: ${mediaOptions.tabletPortraitEnd}${units})').matches,
+                isTabletLandscape: window.matchMedia('(min-width: ${mediaOptions.tabletLandscapeStart}${units}) and (max-width: ${mediaOptions.tabletLandscapeEnd}${units})').matches,
+                isDesktop: window.matchMedia('(min-width: ${mediaOptions.desktopStart}${units})').matches,
               }
             };
 
@@ -150,10 +179,20 @@ module.exports = class MediaQuerySplittingPlugin {
               tryAppendNewMedia()
             };
 
-            document.addEventListener('DOMContentLoaded', function() {
-              window.addEventListener('resize', resize);
-              resize();
-            });
+            var afterDOMLoaded = function() {
+              if (!window.isListenerAdded) {
+                window.addEventListener('resize', resize);
+                window.isListenerAdded = true;
+                resize();
+              }
+            };
+
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded',afterDOMLoaded);
+            }
+            else {
+              afterDOMLoaded();
+            }
           `
 
           const promisesString           = 'promises.push(installedCssChunks[chunkId] = new Promise(function(resolve, reject) {'
@@ -199,7 +238,7 @@ module.exports = class MediaQuerySplittingPlugin {
         const asset                      = compilation.assets[chunkName]
         const child                      = asset.children && asset.children[0]
         const chunkValue                 = typeof asset.source === 'function' ? asset.source() : (child || asset)._value
-        const splittedValue              = splitByMediaQuery({ cssFile: chunkValue, mediaOptions })
+        const splittedValue              = splitByMediaQuery({ cssFile: chunkValue, mediaOptions, minify, units })
         const chunkHash                  = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
         const chunkId                    = chunkName.replace(/\..*/, '')
 

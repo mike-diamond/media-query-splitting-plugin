@@ -1,10 +1,10 @@
-const css            = require('css')
-const CleanCSS       = require('clean-css')
+import css from 'css'
+import CleanCSS from 'clean-css'
 
-const matchMedia     = require('./matchMedia')
+import matchMedia from './matchMedia'
 
 
-module.exports = ({ cssFile, mediaOptions }) => {
+const splitByMediaQuery = ({ cssFile, mediaOptions, minify, units }) => {
   const output       = {}
   const inputRules   = css.parse(cssFile).stylesheet.rules
   const outputRules  = {
@@ -23,7 +23,7 @@ module.exports = ({ cssFile, mediaOptions }) => {
       isTabletLandscape,
       isTabletPortrait,
       isMobile,
-    } = matchMedia({ mediaQuery: media, mediaOptions })
+    } = matchMedia({ mediaQuery: media, mediaOptions, units })
 
     const rule       = inputRules[index]
     const isNoMatch  = !isDesktop && !isTablet && !isMobile
@@ -57,8 +57,8 @@ module.exports = ({ cssFile, mediaOptions }) => {
     const rules      = outputRules[key]
 
     // Merge duplicates media conditions
-    rules.forEach((rule, index) => {
-      const { media, rules, position } = rule
+    rules.forEach((rule) => {
+      const { media, rules } = rule
 
       const mediaIndex = output[key].map(({ media }) => media).indexOf(media)
 
@@ -77,8 +77,16 @@ module.exports = ({ cssFile, mediaOptions }) => {
     })
 
     // Minify styles
-    output[key] = (new CleanCSS().minify(style)).styles
+    if (minify) {
+      output[key] = (new CleanCSS().minify(style)).styles
+    }
+    else {
+      output[key] = style
+    }
   })
 
   return output
 }
+
+
+export default splitByMediaQuery

@@ -1,6 +1,6 @@
 {
   "name": "media-query-splitting-plugin",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "Webpack 4 plugin for styles splitting by media query",
   "main": "src/index.js",
   "scripts": {
@@ -26,8 +26,9 @@
   },
   "homepage": "https://github.com/mike-diamond/media-query-splitting-plugin#readme",
   "dependencies": {
-    "clean-css": "^4.2.1",
-    "css": "^2.2.4"
+    "clean-css": "4.2.1",
+    "css": "2.2.4",
+    "css-mediaquery": "0.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
