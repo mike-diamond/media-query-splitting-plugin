@@ -1,10 +1,10 @@
-import getOptions from './getOptions'
+const getOptions = require('./getOptions')
 
-import handleApplyOld from './handleApplyOld'
-import handleApplyNew from './handleApplyNew'
+const handleApplyOld = require('./handleApplyOld')
+const handleApplyNew = require('./handleApplyNew')
 
 
-export default class MediaQuerySplittingPlugin {
+module.exports = class MediaQuerySplittingPlugin {
 
   constructor(options) {
     this.options = getOptions(options)
