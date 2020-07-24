@@ -1,11 +1,11 @@
 {
   "name": "media-query-splitting-plugin",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "Webpack 4 plugin for styles splitting by media query",
   "main": "src/index.js",
   "scripts": {
-    "transpile": "babel ./dist --out-dir ./src",
-    "minify": "minify ./src/index.js -d ./src && minify ./src/getOptions.js -d ./src && minify ./src/handleApplyNew.js -d ./src && minify ./src/handleApplyOld.js -d ./src && minify ./src/splitByMediaQueryNew/index.js -d ./src/splitByMediaQueryNew && minify ./src/splitByMediaQueryNew/matchMedia.js -d ./src/splitByMediaQueryNew && minify ./src/splitByMediaQueryOld/index.js -d ./src/splitByMediaQueryOld && minify ./src/splitByMediaQueryOld/matchMedia.js -d ./src/splitByMediaQueryOld",
+    "transpile": "babel ./src --out-dir ./dist",
+    "minify": "minify ./dist/index.js -d ./dist && minify ./dist/getOptions.js -d ./dist && minify ./dist/handleApplyNew.js -d ./dist && minify ./dist/handleApplyOld.js -d ./dist && minify ./dist/splitByMediaQueryNew/index.js -d ./dist/splitByMediaQueryNew && minify ./dist/splitByMediaQueryNew/matchMedia.js -d ./dist/splitByMediaQueryNew && minify ./dist/splitByMediaQueryOld/index.js -d ./dist/splitByMediaQueryOld && minify ./dist/splitByMediaQueryOld/matchMedia.js -d ./dist/splitByMediaQueryOld",
     "build": "npm run transpile && npm run minify"
   },
   "repository": {
@@ -28,12 +28,13 @@
   "dependencies": {
     "clean-css": "4.2.1",
     "css": "2.2.4",
-    "css-mediaquery": "0.1.2"
+    "webpack": "4.4.0",
+    "webpack-sources": "^1.4.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "babel-minify": "^0.5.0"
+    "@babel/cli": "7.0.0",
+    "@babel/core": "7.0.0",
+    "@babel/preset-env": "7.0.0",
+    "babel-minify": "0.5.0"
   }
 }

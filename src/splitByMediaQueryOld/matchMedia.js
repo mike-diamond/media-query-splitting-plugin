@@ -1,1 +1,62 @@
-"use strict";var matchMedia=function(a){var b=a.mediaQuery,c=void 0===b?"":b,d=a.mediaOptions,e=a.units,f=c.replace(/:/g,": ").replace(/,/g,", ").replace(/  /g," "),g=new RegExp("(min-width: ".concat(d.desktopStart).concat(e,")")),h=new RegExp("(min-width: ".concat(d.tabletLandscapeStart).concat(e,") and (max-width: ").concat(d.tabletLandscapeEnd).concat(e,")")),i=new RegExp("(min-width: ".concat(d.tabletPortraitStart).concat(e,") and (max-width: ").concat(d.tabletLandscapeEnd).concat(e,")")),j=new RegExp("(min-width: ".concat(d.tabletPortraitStart).concat(e,") and (max-width: ").concat(d.tabletPortraitEnd).concat(e,")")),k=new RegExp("(max-width: ".concat(d.mobileEnd).concat(e,")")),l=new RegExp("(min-width: ".concat(d.tabletLandscapeStart).concat(e,")")),m=new RegExp("(max-width: ".concat(d.tabletLandscapeEnd).concat(e,")")),n=new RegExp("(min-width: ".concat(d.tabletPortraitStart).concat(e,")")),o=new RegExp("(max-width: ".concat(d.tabletLandscapeEnd).concat(e,")")),p=new RegExp("(min-width: ".concat(d.tabletPortraitStart).concat(e,")")),q=new RegExp("(max-width: ".concat(d.tabletPortraitEnd).concat(e,")")),r=g.test(f)||l.test(f)||p.test(f)||n.test(f),s=i.test(f)||h.test(f)||p.test(f)||m.test(f)||l.test(f)||n.test(f)||o.test(f),t=i.test(f)||j.test(f)||p.test(f)||q.test(f)||m.test(f)||n.test(f)||o.test(f),u=k.test(f)||q.test(f)||m.test(f)||o.test(f);return{isDesktop:r,isTablet:t||s,isTabletLandscape:s,isTabletPortrait:t,isMobile:u}};module.exports=matchMedia;
+const matchMedia = ({ mediaQuery: _mediaQuery = '', mediaOptions, units }) => {
+  const mediaQuery                = _mediaQuery.replace(/:/g, ': ').replace(/,/g, ', ').replace(/  /g, ' ')
+
+  const desktop                   = new RegExp(`(min-width: ${mediaOptions.desktopStart}${units})`)
+  const tabletLandscape           = new RegExp(`(min-width: ${mediaOptions.tabletLandscapeStart}${units}) and (max-width: ${mediaOptions.tabletLandscapeEnd}${units})`)
+  const tablet                    = new RegExp(`(min-width: ${mediaOptions.tabletPortraitStart}${units}) and (max-width: ${mediaOptions.tabletLandscapeEnd}${units})`)
+  const tabletPortrait            = new RegExp(`(min-width: ${mediaOptions.tabletPortraitStart}${units}) and (max-width: ${mediaOptions.tabletPortraitEnd}${units})`)
+  const mobile                    = new RegExp(`(max-width: ${mediaOptions.mobileEnd}${units})`)
+  const tabletLandscapeAndHigher  = new RegExp(`(min-width: ${mediaOptions.tabletLandscapeStart}${units})`)
+  const tabletLandscapeAndLower   = new RegExp(`(max-width: ${mediaOptions.tabletLandscapeEnd}${units})`)
+  const exceptMobile              = new RegExp(`(min-width: ${mediaOptions.tabletPortraitStart}${units})`)
+  const exceptDesktop             = new RegExp(`(max-width: ${mediaOptions.tabletLandscapeEnd}${units})`)
+  const tabletPortraitAndHigher   = new RegExp(`(min-width: ${mediaOptions.tabletPortraitStart}${units})`)
+  const tabletPortraitAndLower    = new RegExp(`(max-width: ${mediaOptions.tabletPortraitEnd}${units})`)
+
+  const isDesktop = (
+    desktop.test(mediaQuery)
+    || tabletLandscapeAndHigher.test(mediaQuery)
+    || tabletPortraitAndHigher.test(mediaQuery)
+    || exceptMobile.test(mediaQuery)
+  )
+
+  const isTabletLandscape = (
+    tablet.test(mediaQuery)
+    || tabletLandscape.test(mediaQuery)
+    || tabletPortraitAndHigher.test(mediaQuery)
+    || tabletLandscapeAndLower.test(mediaQuery)
+    || tabletLandscapeAndHigher.test(mediaQuery)
+    || exceptMobile.test(mediaQuery)
+    || exceptDesktop.test(mediaQuery)
+  )
+
+  const isTabletPortrait = (
+    tablet.test(mediaQuery)
+    || tabletPortrait.test(mediaQuery)
+    || tabletPortraitAndHigher.test(mediaQuery)
+    || tabletPortraitAndLower.test(mediaQuery)
+    || tabletLandscapeAndLower.test(mediaQuery)
+    || exceptMobile.test(mediaQuery)
+    || exceptDesktop.test(mediaQuery)
+  )
+
+  const isTablet = isTabletPortrait || isTabletLandscape
+
+  const isMobile = (
+    mobile.test(mediaQuery)
+    || tabletPortraitAndLower.test(mediaQuery)
+    || tabletLandscapeAndLower.test(mediaQuery)
+    || exceptDesktop.test(mediaQuery)
+  )
+
+  return {
+    isDesktop,
+    isTablet,
+    isTabletLandscape,
+    isTabletPortrait,
+    isMobile,
+  }
+}
+
+
+module.exports = matchMedia

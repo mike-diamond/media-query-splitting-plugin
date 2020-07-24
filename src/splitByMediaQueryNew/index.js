@@ -1,1 +1,75 @@
-"use strict";var css=require("css"),CleanCSS=require("clean-css"),matchMedia=require("./matchMedia"),splitByMediaQuery=function(a){var b=a.cssFile,c=a.mediaOptions,d=a.minify,e={},f=css.parse(b).stylesheet.rules,g={common:[]};return Object.keys(c).forEach(function(a){g[a]=[]}),f.forEach(function(a,b){var d=a.type,e=a.media,h=matchMedia({mediaQuery:e,mediaOptions:c}),i=f[b],j=Object.values(h).every(function(a){return!a});"media"!==d||j?g.common.push(i):Object.keys(h).forEach(function(a){var b=h[a];b&&g[a].push(i)})}),Object.keys(g).forEach(function(a){e[a]=[];var b=g[a];b.forEach(function(b){var c=b.media,d=b.rules,f=e[a].map(function(a){var b=a.media;return b}).indexOf(c);!c||0>f?e[a].push(b):e[a][f].rules=e[a][f].rules.concat(d)});var c=css.stringify({type:"stylesheet",stylesheet:{rules:e[a]}});e[a]=d?new CleanCSS().minify(c).styles:c}),e};module.exports=splitByMediaQuery;
+const css = require('css')
+const CleanCSS = require('clean-css')
+
+const matchMedia = require('./matchMedia')
+
+
+const splitByMediaQuery = ({ cssFile, mediaOptions, minify }) => {
+  const output       = {}
+  const inputRules   = css.parse(cssFile).stylesheet.rules
+  const outputRules  = {
+    common: [],
+  }
+
+  Object.keys(mediaOptions).forEach((mediaKey) => {
+    outputRules[mediaKey] = []
+  })
+
+  inputRules.forEach(({ type, media }, index) => {
+    const matchedMediaKeys = matchMedia({ mediaQuery: media, mediaOptions })
+
+    const rule       = inputRules[index]
+    const isNoMatch  = Object.values(matchedMediaKeys).every((isMatched) => !isMatched)
+
+    if (type === 'media' && !isNoMatch) {
+      Object.keys(matchedMediaKeys).forEach((mediaKey) => {
+        const isMatched = matchedMediaKeys[mediaKey]
+
+        if (isMatched) {
+          outputRules[mediaKey].push(rule)
+        }
+      })
+    }
+    else {
+      outputRules.common.push(rule)
+    }
+  })
+
+  Object.keys(outputRules).forEach((key) => {
+    output[key] = []
+    const rules = outputRules[key]
+
+    // Merge duplicates media conditions
+    rules.forEach((rule) => {
+      const { media, rules } = rule
+
+      const mediaIndex = output[key].map(({ media }) => media).indexOf(media)
+
+      if (!media || mediaIndex < 0) {
+        output[key].push(rule)
+      }
+      else {
+        output[key][mediaIndex].rules = output[key][mediaIndex].rules.concat(rules)
+      }
+    })
+
+    // Stringify styles
+    const style = css.stringify({
+      type: 'stylesheet',
+      stylesheet: { rules: output[key] },
+    })
+
+    // Minify styles
+    if (minify) {
+      output[key] = (new CleanCSS().minify(style)).styles
+    }
+    else {
+      output[key] = style
+    }
+  })
+
+  return output
+}
+
+
+module.exports = splitByMediaQuery
