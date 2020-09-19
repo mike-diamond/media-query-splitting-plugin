@@ -15,7 +15,7 @@ const matchMedia = ({ mediaQuery: _mediaQuery = '', mediaOptions, units }) => {
   if (isMinQuery) {
     const match = mediaQuery.match(min);
     const number = match['groups'].min
-    isMobile = (number <= mediaOptions.mobileEnd)
+    isMobile = (number < mediaOptions.mobileEnd)
     isTabletPortrait = (number <= mediaOptions.tabletPortraitEnd);
     isTabletLandscape = (number <= mediaOptions.tabletLandscapeEnd);
     isDesktop = true;
@@ -23,17 +23,17 @@ const matchMedia = ({ mediaQuery: _mediaQuery = '', mediaOptions, units }) => {
     const match = mediaQuery.match(max);
     const number = match['groups'].max
     isMobile = true
-    isTabletPortrait = (number > mediaOptions.tabletPortraitEnd)
-    isTabletLandscape = (number > mediaOptions.tabletLandscapeEnd)
+    isTabletPortrait = (number >= mediaOptions.tabletPortraitEnd)
+    isTabletLandscape = (number >= mediaOptions.tabletLandscapeEnd)
     isDesktop = (number >= mediaOptions.desktopStart)
   } else if (isBetweenQuery) {
     const matchMin = mediaQuery.match(min);
     const matchMax = mediaQuery.match(max);
     const minNumber = matchMin['groups'].min
     const maxNumber = matchMax['groups'].max
-    isMobile = (minNumber <= mediaOptions.mobileEnd)
-    isTabletPortrait = (minNumber <= mediaOptions.tabletPortraitEnd || maxNumber > mediaOptions.tabletPortraitEnd);
-    isTabletLandscape = (minNumber <= mediaOptions.tabletLandscapeEnd || maxNumber > mediaOptions.tabletLandscapeEnd);
+    isMobile = (minNumber < mediaOptions.mobileEnd)
+    isTabletPortrait = (minNumber <= mediaOptions.tabletPortraitEnd && maxNumber >= mediaOptions.tabletPortraitEnd);
+    isTabletLandscape = (minNumber <= mediaOptions.tabletLandscapeEnd && maxNumber >= mediaOptions.tabletLandscapeEnd);
     isDesktop = (maxNumber >= mediaOptions.desktopStart);
   }
 
