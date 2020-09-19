@@ -1,7 +1,7 @@
 const css = require('css')
 const CleanCSS = require('clean-css')
 
-const matchMedia = require('./matchMedia')
+const matchMedia = require('./matchMedia2')
 
 
 const splitByMediaQuery = ({ cssFile, mediaOptions, minify, units }) => {
