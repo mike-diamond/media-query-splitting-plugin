@@ -23,35 +23,38 @@ This plugin is addition to [mini-css-extract-plugin](https://github.com/webpack-
 `0.mobile.04a9302b77ca5a27bfee.css` - *(max-width: 568px)*<br/>
 
 
-Also it handles loading of this files depending of the client's screen width, it happens on loading new chunk or on window resize. 
+Also it handles loading of these files depending of the client's screen width, it happens on loading new chunk or on window resize. 
 
 
 
 ## Options
-This is default options, it can be omitted.
+#### Attention! From version 2.0.0 and above format of options changed. Now it used media query instead of breakpoints
+
+
+This is default options and can be omitted.
 
 ```js
 {
   media: {
-    mobileEnd: 568,
-    tabletPortraitEnd: 768,
-    tabletLandscapeEnd: 1024,
+    mobile: '(max-width: 568px)',
+    tabletPortrait: {
+      query: '(min-width: 569px) and (max-width: 768px)',
+      prefetch: 'tabletLandscape',
+      withCommonStyles: false,
+    },
+    tabletLandscape: {
+      query: '(min-width: 769px) and (max-width: 1024px)',
+      prefetch: 'tabletPortrait',
+      withCommonStyles: false,
+    },
+    desktop: '(min-width: 1025px)',
   },
-  splitTablet: true,
   minify: true,
-  units: 'px',
 }
 ```
-You can define your own media breakpoints in the media option. The plugin will create regular expression to check is media query fit input media query rule.
-Also if you define `splitTablet: false` on the client side won't be used tabletPortrait or tabletLandscape styles. Instead will be used tablet style which includes both landscape and portrait.
+You can define your own media type in the media option. The plugin will create regular expression to check is media query fit input media query rule.
 
 If you want to disable css minification, set `minify: false`, this parameter by default is `true`.
-
-If you want to use `rem` in media query - set `units: 'rem'`, which is by default `px`.
-
-Pay attention that on server side we can't define by user-agent which tablet version the client used - landscape or portrait, that's why we send tablet version in the response. After user receives that response, the next chunk loading happens on client side (for example when user go to another page of our app), so than we can match browser media and load suitable tablet version.
-
-
 
 
 ## Install
@@ -77,13 +80,20 @@ module.exports = {
     new MediaQuerySplittingPlugin({
       // This is default config (optional)
       media: {
-        mobileEnd: 568,
-        tabletPortraitEnd: 768,
-        tabletLandscapeEnd: 1024,
+        mobile: '(max-width: 568px)',
+        tabletPortrait: {
+          query: '(min-width: 569px) and (max-width: 768px)',
+          prefetch: 'tabletLandscape',
+          withCommonStyles: false,
+        },
+        tabletLandscape: {
+          query: '(min-width: 769px) and (max-width: 1024px)',
+          prefetch: 'tabletPortrait',
+          withCommonStyles: false,
+        },
+        desktop: '(min-width: 1025px)',
       },
-      splitTablet: true,
       minify: true,
-      units: 'px',
     })
   ],
   module: {
@@ -121,21 +131,27 @@ All you need is to define client device type (mobile, tablet or desktop) and add
       .map(({ publicPath }) => {
         const { isMobile, isTablet } = req
 
-        let mediaType     = 'desktop'
+        let mediaType = 'desktop'
 
         if (isMobile) {
-          mediaType       = 'mobile'
+          mediaType = 'mobile'
         }
         else if (isTablet) {
-          mediaType       = 'tablet'
+          mediaType = 'tabletPortrait'
         }
 
         const chunkId     = publicPath.replace(/.*\//,'').replace(/\..*/, '')
         const mediaPath   = publicPath.replace(chunkId, `${chunkId}.${mediaType}`)
 
+        if (assets[''].css.includes(mediaPath)) {
+          return `
+            <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
+            <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.${mediaType}.04a9302b77ca5a27bfee.css)
+          `
+        }
+        
         return `
           <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
-          <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.${mediaType}.04a9302b77ca5a27bfee.css)
         `
       })
   )

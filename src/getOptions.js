@@ -55,49 +55,26 @@ const getMediaOptions = (media) => {
 }
 
 const getOptions = (options = {}) => {
-  const { units = 'px', minify = true, splitTablet, chunkFileName = '[id].[contenthash].css', media = {} } = options
-
-  const hasOptions              = Object.keys(options).length
-  const isMediaWithBreakpoints  = Object.values(media).every((value) => Number(value) >= 0)
-
-  const isOldConfig = !hasOptions || isMediaWithBreakpoints
-
-  if (isOldConfig) {
-    const media = options.media || {}
-
-    return {
-      isOldConfig,
-      units,
-      minify,
-      media: {
-        mobileEnd: media.mobileEnd || 568,
-        tabletPortraitStart: media.mobileEnd ? media.mobileEnd + 1 : 569,
-        tabletPortraitEnd: media.tabletPortraitEnd || 768,
-        tabletLandscapeStart: media.tabletPortraitEnd ? media.tabletPortraitEnd + 1 : 769,
-        tabletLandscapeEnd: media.tabletLandscapeEnd || 1024,
-        desktopStart: media.tabletLandscapeEnd ? media.tabletLandscapeEnd + 1 : 1025,
-      },
-      splitTablet: splitTablet !== false,
-    }
-  }
+  const { minify = true, chunkFileName = '[id].[contenthash].css', media } = options
 
   const defaultMediaOptions = {
     mobile: '(max-width: 568px)',
     tabletPortrait: {
       query: '(min-width: 569px) and (max-width: 768px)',
       prefetch: 'tabletLandscape',
+      withCommonStyles: false,
     },
     tabletLandscape: {
       query: '(min-width: 769px) and (max-width: 1024px)',
       prefetch: 'tabletPortrait',
+      withCommonStyles: false,
     },
     desktop: '(min-width: 1025px)',
   }
 
   return {
-    isOldConfig,
     minify,
-    media: getMediaOptions(options.media || defaultMediaOptions),
+    media: getMediaOptions(media || defaultMediaOptions),
     chunkFileName,
   }
 }
