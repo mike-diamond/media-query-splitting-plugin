@@ -17,7 +17,7 @@ const handleApply = ({ compiler, options }) => {
           var mediaKeys = ${JSON.stringify(Object.keys(mediaOptions))};
           var mediaValues = ${JSON.stringify(Object.values(mediaOptions).map((value) => value.query))};
           var cssChunksMedia = mediaKeys.concat('common');
-          var cssChunksByMedia = {};
+          var cssChunksByMedia = {CSS_CHUNKS_BY_MEDIA:1};
           var appendLink = function(rel, href, type, as) {
             var linkTag = document.createElement('link');
             var header = document.getElementsByTagName('head')[0];
@@ -254,8 +254,8 @@ const handleApply = ({ compiler, options }) => {
 
     const entryChunk = compilation.assets[entryChunkName].source()
     const updatedEntryChunk = entryChunk.replace(
-      /var cssChunksByMedia = \{\}/,
-      `var cssChunksByMedia = ${JSON.stringify(cssChunksByMedia)};`
+      '{CSS_CHUNKS_BY_MEDIA:1}',
+      `${JSON.stringify(cssChunksByMedia)}`
     )
 
     compilation.assets[entryChunkName] = {

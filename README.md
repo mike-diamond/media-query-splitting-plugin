@@ -54,6 +54,20 @@ This is default options and can be omitted.
 ```
 You can define your own media type in the media option. The plugin will create regular expression to check is media query fit input media query rule.
 
+For example you can create chunk for critical css like that:
+```js
+{
+  media: {
+    mobile: '(max-width: 568px)',
+    ...
+    criticalMobile: '(min-width: 1px) and (max-width: 568px)',
+  },
+}
+```
+
+By default common styles (that doesn't wrapped into media query condition) will be added into media chunk.
+If you don't want to add common chunk into media chunk, set 'withCommonStyles: false'.
+
 If you want to disable css minification, set `minify: false`, this parameter by default is `true`.
 
 
