@@ -60,13 +60,35 @@ For example you can create chunk for critical css like that:
   media: {
     mobile: '(max-width: 568px)',
     ...
-    criticalMobile: '(min-width: 1px) and (max-width: 568px)',
+    critical: {
+      query: '(min-width: 1px) and (max-width: 568px)',
+      exact: true,
+      withCommonStyles: false,
+      prefetch: [],
+    },
   },
 }
 ```
 
 By default common styles (that doesn't wrapped into media query condition) will be added into media chunk.
 If you don't want to add common chunk into media chunk, set 'withCommonStyles: false'.
+
+Options can be written in short style as media query string, or in detailed style as object:
+
+Short style:
+```js
+mobile: '(max-width: 568px)',
+```
+
+Is equal to detailed style:
+```js
+mobile: {
+  query: '(max-width: 568px)',
+  exact: false, // include styles that fit condition in 'query' e.g '(max-width: 567px)' or '(min-width: 200px)'
+  withCommonStyles: false, // include common styles without media query condition
+  prefetch: [], // add <link rel="prefetch" /> for some other media chunks
+},
+```
 
 If you want to disable css minification, set `minify: false`, this parameter by default is `true`.
 
