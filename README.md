@@ -85,7 +85,7 @@ Is equal to detailed style:
 mobile: {
   query: '(max-width: 568px)',
   exact: false, // include styles that fit condition in 'query' e.g '(max-width: 567px)' or '(min-width: 200px)'
-  withCommonStyles: false, // include common styles without media query condition
+  withCommonStyles: true, // include common styles without media query condition
   prefetch: [], // add <link rel="prefetch" /> for some other media chunks
 },
 ```
