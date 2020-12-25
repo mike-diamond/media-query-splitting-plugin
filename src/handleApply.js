@@ -62,11 +62,10 @@ const handleApply = ({ compiler, options }) => {
               var chunkHref = linkElements[i].href.replace(/.*\\//, '');
 
               if (/(${Object.keys(mediaOptions).map((key) => key).join('|')}).*\\.css$/.test(chunkHref)) {
-                var chunkId = chunkHref.replace(/\\..*/, '');
                 var chunkMediaType = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
-                var chunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][chunkMediaType];
-                var chunkHrefPrefix = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');
-
+                var pervChunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(chunkMediaType)] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(chunkMediaType)].hash;
+                var chunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(currentMediaType)] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(currentMediaType)].hash;
+                var chunkHrefPrefix = linkElements[i].href.replace(new RegExp(chunkId + '\\..+'), '');
                 if (getChunkOptions(chunkId, chunkMediaType)) {
                   if (!chunkIds[chunkId]) {
                     chunkIds[chunkId] = {
