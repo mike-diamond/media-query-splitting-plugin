@@ -153,6 +153,16 @@ All you need is to define client device type (mobile, tablet or desktop) and add
   const assets = require('assets.json') // webpack-assets-manifest
 
   const bundles  = getBundles(loadableAssets, loadableModules).filter(({ file }) => !/map$/.test(file))
+  const chunksById = assets[''].css.reduce((result, chunk) => {
+    const [ id, mediaType ] = chunk.replace(/.+\//, '').split('.')
+    
+    if (id) {
+      result[id] = result[id] || {}
+      result[id][mediaType] = chunk
+    }
+    
+    return result
+  }, {})
 
   const styles   = (
     bundles
@@ -170,19 +180,14 @@ All you need is to define client device type (mobile, tablet or desktop) and add
           mediaType = 'tabletPortrait'
         }
 
-        const chunkId     = publicPath.replace(/.*\//,'').replace(/\..*/, '')
-        const mediaPath   = publicPath.replace(chunkId, `${chunkId}.${mediaType}`)
+        const chunkId = publicPath.replace(/.*\//,'').replace(/\..*/, '')
+        const mediaPath = chunksById[chunkId][mediaType]
 
-        if (assets[''].css.includes(mediaPath)) {
+        if (mediaPath) {
           return `
-            <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
-            <link rel="stylesheet" href="${mediaPath}" />  // Media chunk  (0.${mediaType}.04a9302b77ca5a27bfee.css)
+            <link rel="stylesheet" href="${mediaPath}" />  // Media chunk with common styles (0.${mediaType}.04a9302b77ca5a27bfee.css)
           `
         }
-        
-        return `
-          <link rel="stylesheet" href="${publicPath}" /> // Common chunk (0.04a9302b77ca5a27bfee.css)
-        `
       })
   )
 
