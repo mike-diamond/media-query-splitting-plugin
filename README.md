@@ -39,12 +39,10 @@ This is default options and can be omitted.
     mobile: '(max-width: 568px)',
     tabletPortrait: {
       query: '(min-width: 569px) and (max-width: 768px)',
-      prefetch: 'tabletLandscape',
       withCommonStyles: false,
     },
     tabletLandscape: {
       query: '(min-width: 769px) and (max-width: 1024px)',
-      prefetch: 'tabletPortrait',
       withCommonStyles: false,
     },
     desktop: '(min-width: 1025px)',
@@ -64,7 +62,6 @@ For example you can create chunk for critical css like that:
       query: '(min-width: 1px) and (max-width: 568px)',
       exact: true,
       withCommonStyles: false,
-      prefetch: [],
     },
   },
 }
@@ -86,7 +83,6 @@ mobile: {
   query: '(max-width: 568px)',
   exact: false, // include styles that fit condition in 'query' e.g '(max-width: 567px)' or '(min-width: 200px)'
   withCommonStyles: true, // include common styles without media query condition
-  prefetch: [], // add <link rel="prefetch" /> for some other media chunks
 },
 ```
 
@@ -119,12 +115,10 @@ module.exports = {
         mobile: '(max-width: 568px)',
         tabletPortrait: {
           query: '(min-width: 569px) and (max-width: 768px)',
-          prefetch: 'tabletLandscape',
           withCommonStyles: false,
         },
         tabletLandscape: {
           query: '(min-width: 769px) and (max-width: 1024px)',
-          prefetch: 'tabletPortrait',
           withCommonStyles: false,
         },
         desktop: '(min-width: 1025px)',

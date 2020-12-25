@@ -1,5 +1,6 @@
 const fs = require('fs')
 const splitByMediaQuery = require('./splitByMediaQuery')
+const { sha1 } = require('crypto-hash')
 
 
 const handleApply = ({ compiler, options }) => {
@@ -63,7 +64,7 @@ const handleApply = ({ compiler, options }) => {
               if (/(${Object.keys(mediaOptions).map((key) => key).join('|')}).*\\.css$/.test(chunkHref)) {
                 var chunkId = chunkHref.replace(/\\..*/, '');
                 var chunkMediaType = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
-                var chunkHash = chunkHref.replace(/\\.css$/, '').replace('' + chunkId + '.' + chunkMediaType + '.', '');
+                var chunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][chunkMediaType];
                 var chunkHrefPrefix = linkElements[i].href.replace('' + chunkId + '.' + chunkMediaType + '.' + chunkHash + '.css', '');
 
                 if (getChunkOptions(chunkId, chunkMediaType)) {
@@ -130,8 +131,10 @@ const handleApply = ({ compiler, options }) => {
             }
             else {
               if (chunkOptions.prefetch) {
-                console.log(chunkOptions.prefetch)
-                // appendLink('prefetch', fullhref, undefined, 'style')
+                for (var i = 0; i < chunkOptions.prefetch.length; i++) {
+                  // TODO generate fullhref to prefetch
+                  // appendLink('prefetch', fullhref, undefined, 'style')
+                }
               }
             }
 
@@ -143,10 +146,15 @@ const handleApply = ({ compiler, options }) => {
 
         const hrefString = source.replace(/(.|\n)*var href = \"/, '').replace(/\";(.|\n)*/, '')
         const isPlainChunkId = / chunkId /.test(hrefString)
-        const mediaTypeString = isPlainChunkId
-          ? hrefString.replace(/ chunkId /, ' chunkId + (mediaType !== "common" ? "."  + mediaType : "") ')
-          : hrefString.replace(' + "." + ', ' + (mediaType !== "common" ? "."  + mediaType + "." : ".") + ')
+        const mediaTypeString = (
+          isPlainChunkId
+            ? hrefString.replace(/ chunkId /, ' chunkId + (mediaType !== "common" ? "."  + mediaType : "") ')
+            : hrefString.replace(' + "." + ', ' + (mediaType !== "common" ? "."  + mediaType + "." : ".") + ')
+        )
+          .replace(/ \+ \{/, ' + (mediaType !== \'common\' ? getChunkOptions(chunkId, mediaType).hash : {')
+          .replace(' + ".css', ') + ".css')
 
+        console.log({ mediaTypeString })
         return source
           .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
           .replace(hrefString, mediaTypeString)
@@ -163,6 +171,8 @@ const handleApply = ({ compiler, options }) => {
     const needRemoveCommonChunk = Object.values(mediaOptions).every(({ withCommonStyles }) => withCommonStyles)
     const cssChunksMedia = Object.keys(mediaOptions).concat('common')
     const cssChunksByMedia = {}
+
+    const promises = []
 
     // Split each css chunk
     cssChunks.forEach((chunkName) => {
@@ -206,7 +216,6 @@ const handleApply = ({ compiler, options }) => {
       Object.keys(splittedValue).forEach((mediaType) => {
         const splittedMediaChunk = splittedValue[mediaType]
         const isCommon = mediaType === 'common'
-        const splittedMediaChunkName = isCommon ? chunkName : `${chunkId}.${mediaType}.${chunkHash}.css`
 
         // TODO add exclusions (e.g. manual splitted chunks)?
         if (isCommon && (!splittedMediaChunk || needRemoveCommonChunk)) {
@@ -227,43 +236,59 @@ const handleApply = ({ compiler, options }) => {
           // Add existed chunk for entry chunk code
           const mediaChunkId = chunkId.replace(/.+\//, '')
           cssChunksByMedia[mediaChunkId] = cssChunksByMedia[mediaChunkId] || {}
-          cssChunksByMedia[mediaChunkId][cssChunksMedia.indexOf(mediaType)] = {
-            common: !isCommon && mediaOptions[mediaType].withCommonStyles,
-            prefetch: (
-              !isCommon
-              && !!mediaOptions[mediaType].prefetch
-              && !!mediaOptions[mediaType].prefetch.filter((mediaType) => cssChunksMedia.indexOf(mediaType) !== -1).length
-              && mediaOptions[mediaType].prefetch.filter((mediaType) => cssChunksMedia.indexOf(mediaType) !== -1).map((mediaType) => cssChunksMedia.indexOf(mediaType))
-            ),
-          }
 
-          // Add chunk to assets
-          compilation.assets[splittedMediaChunkName] = {
-            size: () => Buffer.byteLength(splittedMediaChunk, 'utf8'),
-            source: () => Buffer.from(splittedMediaChunk),
-          }
+          promises.push(
+            new Promise((resolve) => {
+              sha1(splittedMediaChunk)
+                .then((hash) => {
+                  const splittedMediaChunkName = isCommon ? chunkName : `${chunkId}.${mediaType}.${hash}.css`
+
+                  cssChunksByMedia[mediaChunkId][cssChunksMedia.indexOf(mediaType)] = {
+                    hash,
+                    common: !isCommon && mediaOptions[mediaType].withCommonStyles,
+                    prefetch: (
+                      !isCommon
+                      && !!mediaOptions[mediaType].prefetch
+                      && !!mediaOptions[mediaType].prefetch.filter((mediaType) => cssChunksMedia.indexOf(mediaType) !== -1).length
+                      && mediaOptions[mediaType].prefetch.filter((mediaType) => cssChunksMedia.indexOf(mediaType) !== -1).map((mediaType) => cssChunksMedia.indexOf(mediaType))
+                    ),
+                  }
+
+                  // Add chunk to assets
+                  compilation.assets[splittedMediaChunkName] = {
+                    size: () => Buffer.byteLength(splittedMediaChunk, 'utf8'),
+                    source: () => Buffer.from(splittedMediaChunk),
+                  }
+
+                  resolve()
+                })
+            })
+          )
         }
       })
     })
 
-    // TODO use mainTemplate hook instead
-    const entryChunkId = Object.keys(compilation.options.entry)[0]
-    const entryChunkName = Object.keys(compilation.assets).find((name) => (
-      new RegExp(`${entryChunkId}.+js$`).test(name)
-    ))
+    Promise.all(promises)
+      .then(() => {
+        // TODO use mainTemplate hook instead
+        const entryChunkId = Object.keys(compilation.options.entry)[0]
+        const entryChunkName = Object.keys(compilation.assets).find((name) => (
+          new RegExp(`${entryChunkId}.+js$`).test(name)
+        ))
 
-    const entryChunk = compilation.assets[entryChunkName].source()
-    const updatedEntryChunk = entryChunk.replace(
-      '{CSS_CHUNKS_BY_MEDIA:1}',
-      `${JSON.stringify(cssChunksByMedia)}`
-    )
+        const entryChunk = compilation.assets[entryChunkName].source()
+        const updatedEntryChunk = entryChunk.replace(
+          '{CSS_CHUNKS_BY_MEDIA:1}',
+          `${JSON.stringify(cssChunksByMedia)}`
+        )
 
-    compilation.assets[entryChunkName] = {
-      size: () => Buffer.byteLength(updatedEntryChunk, 'utf8'),
-      source: () => Buffer.from(updatedEntryChunk),
-    }
+        compilation.assets[entryChunkName] = {
+          size: () => Buffer.byteLength(updatedEntryChunk, 'utf8'),
+          source: () => Buffer.from(updatedEntryChunk),
+        }
 
-    callback()
+        callback()
+      })
   })
 }
 

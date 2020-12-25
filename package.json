@@ -1,11 +1,11 @@
 {
   "name": "media-query-splitting-plugin",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Webpack 4 plugin for styles splitting by media query",
   "main": "src/index.js",
   "scripts": {
     "transpile": "babel ./src --out-dir ./dist",
-    "minify": "minify ./dist/index.js -d ./dist && minify ./dist/getOptions.js -d ./dist && minify ./dist/handleApplyNew.js -d ./dist && minify ./dist/handleApplyOld.js -d ./dist && minify ./dist/splitByMediaQueryNew/index.js -d ./dist/splitByMediaQueryNew && minify ./dist/splitByMediaQueryNew/matchMedia.js -d ./dist/splitByMediaQueryNew && minify ./dist/splitByMediaQueryOld/index.js -d ./dist/splitByMediaQueryOld && minify ./dist/splitByMediaQueryOld/matchMedia.js -d ./dist/splitByMediaQueryOld",
+    "minify": "minify ./dist/index.js -d ./dist && minify ./dist/getOptions.js -d ./dist && minify ./dist/splitByMediaQuery/index.js -d ./dist/splitByMediaQuery && minify ./dist/splitByMediaQuery/matchMedia.js -d ./dist/splitByMediaQuery",
     "build": "npm run transpile && npm run minify"
   },
   "repository": {
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/mike-diamond/media-query-splitting-plugin#readme",
   "dependencies": {
     "clean-css": "4.2.1",
+    "crypto-hash": "^1.3.0",
     "css": "2.2.4",
     "css-mediaquery": "^0.1.2",
     "webpack": "4.4.0",
