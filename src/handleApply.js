@@ -154,7 +154,6 @@ const handleApply = ({ compiler, options }) => {
           .replace(/ \+ \{/, ' + (mediaType !== \'common\' ? getChunkOptions(chunkId, mediaType).hash : {')
           .replace(' + ".css', ') + ".css')
 
-        console.log({ mediaTypeString })
         return source
           .replace(promisesString, `${matchMediaPolyfill}${newPromisesString}`)
           .replace(hrefString, mediaTypeString)
