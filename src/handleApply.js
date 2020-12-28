@@ -19,7 +19,7 @@ const handleApply = ({ compiler, options }) => {
           var mediaValues = ${JSON.stringify(Object.values(mediaOptions).map((value) => value.query))};
           var cssChunksMedia = mediaKeys.concat('common');
           var cssChunksByMedia = {CSS_CHUNKS_BY_MEDIA:1};
-          var appendLink = function(rel, href, type, as) {
+          var appendLink = function(rel, href, type, as, media) {
             var linkTag = document.createElement('link');
             var header = document.getElementsByTagName('head')[0];
 
@@ -27,6 +27,7 @@ const handleApply = ({ compiler, options }) => {
             linkTag.type = type;
             linkTag.as = as;
             linkTag.href = href;
+            linkTag.media = media;
 
             header.appendChild(linkTag);
           }
@@ -60,22 +61,23 @@ const handleApply = ({ compiler, options }) => {
 
             for (var i = 0; i < linkElements.length; i++) {
               var chunkHref = linkElements[i].href.replace(/.*\\//, '');
+              var currentChunkId = chunkHref.replace(/\\..+/, '');
 
               if (/(${Object.keys(mediaOptions).map((key) => key).join('|')}).*\\.css$/.test(chunkHref)) {
-                var chunkMediaType = chunkHref.replace(chunkId + '.', '').replace(/\\..*/, '');
-                var pervChunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(chunkMediaType)] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(chunkMediaType)].hash;
-                var chunkHash = cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(currentMediaType)] && cssChunksByMedia[chunkId][cssChunksMedia.indexOf(currentMediaType)].hash;
-                var chunkHrefPrefix = linkElements[i].href.replace(new RegExp(chunkId + '\\..+'), '');
-                if (getChunkOptions(chunkId, chunkMediaType)) {
-                  if (!chunkIds[chunkId]) {
-                    chunkIds[chunkId] = {
+                var chunkMediaType = chunkHref.replace(currentChunkId + '.', '').replace(/\\..*/, '');
+                var pervChunkHash = cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(chunkMediaType)] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(chunkMediaType)].hash;
+                var chunkHash = cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(currentMediaType)] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(currentMediaType)].hash;
+                var chunkHrefPrefix = linkElements[i].href.replace(new RegExp(currentChunkId + '\\..+'), '');
+                if (getChunkOptions(currentChunkId, chunkMediaType)) {
+                  if (!chunkIds[currentChunkId]) {
+                    chunkIds[currentChunkId] = {
                       mediaTypes: [ chunkMediaType ],
                       hash: chunkHash,
                       prefix: chunkHrefPrefix,
                     }
                   }
                   else {
-                    chunkIds[chunkId].mediaTypes.push(chunkMediaType);
+                    chunkIds[currentChunkId].mediaTypes.push(chunkMediaType);
                   }
                 }
               }
@@ -87,7 +89,7 @@ const handleApply = ({ compiler, options }) => {
 
                 if (!hasCurrentMedia && getChunkOptions(i, currentMediaType)) {
                   var fullhref = '' + chunkIds[i].prefix + '' + i + '.' + currentMediaType + '.' + chunkIds[i].hash + '.css';
-                  appendLink('stylesheet', fullhref, 'text/css', undefined);
+                  appendLink('stylesheet', fullhref, 'text/css', undefined, mediaValues[mediaKeys.indexOf(currentMediaType)]);
                 }
               }
             }
