@@ -36,22 +36,23 @@ const splitByMediaQuery = ({ cssFile, mediaOptions, minify }) => {
   })
 
   Object.keys(outputRules).forEach((key) => {
-    output[key] = []
-    const rules = outputRules[key]
-
-    // Merge duplicates media conditions
-    rules.forEach((rule) => {
-      const { media, rules } = rule
-
-      const mediaIndex = output[key].map(({ media }) => media).indexOf(media)
-
-      if (!media || mediaIndex < 0) {
-        output[key].push(rule)
-      }
-      else {
-        output[key][mediaIndex].rules = output[key][mediaIndex].rules.concat(rules)
-      }
-    })
+    output[key] = outputRules[key]
+    // TODO Merge duplicates media conditions
+    // output[key] = []
+    // const rules = outputRules[key]
+    //
+    // rules.forEach((rule) => {
+    //   const { media, rules } = rule
+    //
+    //   const mediaIndex = output[key].map(({ media }) => media).indexOf(media)
+    //
+    //   if (!media || mediaIndex < 0) {
+    //     output[key].push(rule)
+    //   }
+    //   else {
+    //     output[key][mediaIndex].rules = output[key][mediaIndex].rules.concat(rules)
+    //   }
+    // })
 
     // Stringify styles
     const style = css.stringify({
