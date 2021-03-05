@@ -4,7 +4,7 @@ const { sha1 } = require('crypto-hash')
 
 
 const handleApply = ({ compiler, options }) => {
-  const { mediaOptions, minify } = options
+  const { mediaOptions, minify, chunkFileName: chunkFileNamePattern } = options
 
   const pluginName = 'media-query-splitting-plugin'
 
@@ -241,7 +241,16 @@ const handleApply = ({ compiler, options }) => {
             new Promise((resolve) => {
               sha1(splittedMediaChunk)
                 .then((hash) => {
-                  const splittedMediaChunkName = isCommon ? chunkName : `${chunkId}.${mediaType}.${hash}.css`
+
+                  // default pattern: '[id].[contenthash].css'
+                  const splittedMediaChunkNameParts = chunkFileNamePattern.split(".").map(chunkNamePart => {
+                    if (chunkNamePart === "[id]") return chunkId;
+                    if (chunkNamePart === "[contenthash]") return hash;
+                    return chunkNamePart;
+                  })
+                  splittedMediaChunkNameParts.splice(1, 0, mediaType);
+
+                  const splittedMediaChunkName = isCommon ? chunkName : splittedMediaChunkNameParts.join(".")
 
                   cssChunksByMedia[mediaChunkId][cssChunksMedia.indexOf(mediaType)] = {
                     hash,
