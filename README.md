@@ -109,6 +109,7 @@ module.exports = {
       filename: '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css',
     }),
+    // MediaQuerySplittingPlugin should be placed under MiniCssExtractPlugin
     new MediaQuerySplittingPlugin({
       // This is default config (optional)
       media: {

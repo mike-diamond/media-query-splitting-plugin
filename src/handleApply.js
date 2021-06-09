@@ -67,7 +67,7 @@ const handleApply = ({ compiler, options }) => {
                 var chunkMediaType = chunkHref.replace(currentChunkId + '.', '').replace(/\\..*/, '');
                 var pervChunkHash = cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(chunkMediaType)] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(chunkMediaType)].hash;
                 var chunkHash = cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(currentMediaType)] && cssChunksByMedia[currentChunkId][cssChunksMedia.indexOf(currentMediaType)].hash;
-                var chunkHrefPrefix = linkElements[i].href.replace(new RegExp(currentChunkId + '\\..+'), '');
+                var chunkHrefPrefix = linkElements[i].href.replace(new RegExp(currentChunkId + '\\\\..+'), '');
                 if (getChunkOptions(currentChunkId, chunkMediaType)) {
                   if (!chunkIds[currentChunkId]) {
                     chunkIds[currentChunkId] = {
@@ -180,7 +180,6 @@ const handleApply = ({ compiler, options }) => {
       const child = asset.children && asset.children[0]
       const chunkValue = typeof asset.source === 'function' ? asset.source() : (child || asset)._value
       let splittedValue = splitByMediaQuery({ cssFile: chunkValue, mediaOptions, minify })
-      const chunkHash = chunkName.replace(/\.css$/, '').replace(/.*\./, '')
       const chunkId = chunkName.replace(/\..*/, '')
 
       // Filter empty chunks
@@ -276,15 +275,17 @@ const handleApply = ({ compiler, options }) => {
           new RegExp(`${entryChunkId}.+js$`).test(name)
         ))
 
-        const entryChunk = compilation.assets[entryChunkName].source()
-        const updatedEntryChunk = entryChunk.replace(
-          '{CSS_CHUNKS_BY_MEDIA:1}',
-          `${JSON.stringify(cssChunksByMedia)}`
-        )
+        if (compilation.assets[entryChunkName]) {
+          const entryChunk = compilation.assets[entryChunkName].source()
+          const updatedEntryChunk = entryChunk.replace(
+            '{CSS_CHUNKS_BY_MEDIA:1}',
+            `${JSON.stringify(cssChunksByMedia)}`
+          )
 
-        compilation.assets[entryChunkName] = {
-          size: () => Buffer.byteLength(updatedEntryChunk, 'utf8'),
-          source: () => Buffer.from(updatedEntryChunk),
+          compilation.assets[entryChunkName] = {
+            size: () => Buffer.byteLength(updatedEntryChunk, 'utf8'),
+            source: () => Buffer.from(updatedEntryChunk),
+          }
         }
 
         callback()

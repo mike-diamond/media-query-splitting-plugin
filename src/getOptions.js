@@ -1,5 +1,5 @@
 const getPrefetchOption = ({ prefetch, mediaKeys, mediaKey }) => {
-  const prefetchArray             = Array.isArray(prefetch) ? prefetch : [ prefetch ]
+  const prefetchArray             = Array.isArray(prefetch) ? prefetch : prefetch ? [ prefetch ] : []
   const notAllowedPrefetchValues  = prefetchArray.filter((prefetchKey) => !mediaKeys.includes(prefetchKey))
 
   if (notAllowedPrefetchValues.length) {
