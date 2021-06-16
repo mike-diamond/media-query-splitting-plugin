@@ -55,7 +55,7 @@ const getMediaOptions = (media) => {
 }
 
 const getOptions = (options = {}) => {
-  const { minify = true, chunkFileName = '[id].[contenthash].css', media } = options
+  const { minify = true, chunkFileName = '[id].[contenthash].css', media, exclude } = options
 
   const defaultMediaOptions = {
     mobile: '(max-width: 568px)',
@@ -76,6 +76,7 @@ const getOptions = (options = {}) => {
     minify,
     media: getMediaOptions(media || defaultMediaOptions),
     chunkFileName,
+    exclude,
   }
 }
 

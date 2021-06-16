@@ -111,6 +111,10 @@ module.exports = {
     }),
     // MediaQuerySplittingPlugin should be placed under MiniCssExtractPlugin
     new MediaQuerySplittingPlugin({
+      // Prevent splitting for some files
+      exclude: {
+        tailwind: /tailwind-css/,
+      },
       // This is default config (optional)
       media: {
         mobile: '(max-width: 568px)',

@@ -9,7 +9,7 @@ module.exports = class MediaQuerySplittingPlugin {
   }
 
   apply(compiler) {
-    const { media: mediaOptions, minify, chunkFileName } = this.options
+    const { media: mediaOptions, minify, chunkFileName, exclude } = this.options
 
     handleApply({
       compiler,
@@ -17,6 +17,7 @@ module.exports = class MediaQuerySplittingPlugin {
         chunkFileName,
         mediaOptions,
         minify,
+        exclude,
       },
     })
   }

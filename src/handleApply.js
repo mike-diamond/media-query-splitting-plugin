@@ -4,7 +4,7 @@ const { sha1 } = require('crypto-hash')
 
 
 const handleApply = ({ compiler, options }) => {
-  const { mediaOptions, minify } = options
+  const { mediaOptions, minify, exclude } = options
 
   const pluginName = 'media-query-splitting-plugin'
 
@@ -165,7 +165,9 @@ const handleApply = ({ compiler, options }) => {
 
   compiler.plugin('emit', (compilation, callback) => {
     const outputPath = compilation.options.output.path
-    const cssChunks = Object.keys(compilation.assets).filter((asset) => /\.css$/.test(asset))
+    const excludes = Object.values(exclude || {})
+    const cssChunks = Object.keys(compilation.assets)
+      .filter((asset) => /\.css$/.test(asset) && !excludes.some((exclude) => exclude.test(asset)))
 
     const needMergeCommonStyles = Object.values(mediaOptions).some(({ withCommonStyles }) => withCommonStyles)
     const needRemoveCommonChunk = Object.values(mediaOptions).every(({ withCommonStyles }) => withCommonStyles)
